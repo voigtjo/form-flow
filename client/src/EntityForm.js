@@ -1,0 +1,39 @@
+import React from 'react';
+import { Grid, TextField, Button, Typography } from '@mui/material';
+
+const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, name }) => {
+  const isNewRecord = !id;
+
+  const handleClear = () => {
+    onClear();
+  };
+
+  return (
+    <form onSubmit={onSubmit}>
+      <Grid container spacing={2} style={{ marginTop: '32px' }}>
+        <Grid item xs={12}>
+        <Typography variant="h6">{isNewRecord ? 'New '+ name : 'Update ' + name}</Typography>
+        </Grid>
+        {components.map((component, index) => (
+          <Grid key={index} item xs={12}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label={component.label}
+              onChange={(e) => onInputChange(e.target.value, component.props.id)}
+              value={data ? data[component.props.id] || '' : ''}
+              {...component.props}
+            />
+          </Grid>
+        ))}
+        <input type="hidden" name="id" value={id || ''} />
+        <Grid item xs={12}>
+          <Button type="submit" variant="contained" color="primary">Submit</Button>
+          <Button type="button" variant="contained" color="secondary" onClick={handleClear}>Clear</Button>
+        </Grid>
+      </Grid>
+    </form>
+  );
+};
+
+export default EntityForm;
