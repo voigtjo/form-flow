@@ -5,8 +5,8 @@ import EntityTable from './EntityTable';
 import { Container, Typography, Grid, Button } from '@mui/material';
 
 const App = () => {
-  const [userData, setUserData] = useState({ id: null, firstName: '', lastName: '', age: '', email: '', address: '' });
-  const [productData, setProductData] = useState({ id: null, name: '', price: '', description: '' });
+  const [userData, setUserData] = useState({});
+  const [productData, setProductData] = useState({});
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedUserIndex, setSelectedUserIndex] = useState(null);
@@ -14,7 +14,6 @@ const App = () => {
   const [webComponents, setWebComponents] = useState([]);
   const [productWebComponents, setProductWebComponents] = useState([]);
   const [activeTab, setActiveTab] = useState('users');
-
 
   useEffect(() => {
     // Fetching data from REST API for users
@@ -35,15 +34,37 @@ const App = () => {
     // Fetching data from webComponents.json
     fetch('/webComponents.json')
       .then(response => response.json())
-      .then(data => setWebComponents(data))
+      .then(data => {
+        setWebComponents(data);
+        initializeUserData(data);
+      })
       .catch(error => console.error('Error fetching data:', error));
 
     // Fetching data from productWebComponents.json
     fetch('/productWebComponents.json')
       .then(response => response.json())
-      .then(data => setProductWebComponents(data))
+      .then(data => {
+        setProductWebComponents(data);
+        initializeProductData(data);
+      })
       .catch(error => console.error('Error fetching product data:', error));
   }, []);
+
+  const initializeUserData = (data) => {
+    const initialUserData = data.reduce((acc, curr) => {
+      acc[curr.props.id] = '';
+      return acc;
+    }, { id: null });
+    setUserData(initialUserData);
+  };
+
+  const initializeProductData = (data) => {
+    const initialProductData = data.reduce((acc, curr) => {
+      acc[curr.props.id] = '';
+      return acc;
+    }, { id: null });
+    setProductData(initialProductData);
+  };
 
 
   const handleUserInputChange = (value, key) => {
@@ -57,7 +78,7 @@ const App = () => {
   const handleUserSubmit = (e) => {
     e.preventDefault();
     const isNewUser = userData.id === null;
-
+  
     fetch(isNewUser ? 'http://localhost:5050/users' : `http://localhost:5050/users/${userData.id}`, {
       method: isNewUser ? 'POST' : 'PUT',
       headers: {
@@ -75,15 +96,21 @@ const App = () => {
           setUsers(updatedUsers);
           setSelectedUserIndex(null);
         }
-        setUserData({ id: null, firstName: '', lastName: '', age: '', email: '', address: '' });
+        // Initialize userData with values from webComponents.json
+        const initialUserData = webComponents.reduce((acc, curr) => {
+          acc[curr.props.id] = '';
+          return acc;
+        }, { id: null });
+        setUserData(initialUserData);
       })
       .catch(error => console.error('Error saving user:', error));
   };
+  
 
   const handleProductSubmit = (e) => {
     e.preventDefault();
     const isNewProduct = productData.id === null;
-
+  
     fetch(isNewProduct ? 'http://localhost:5050/products' : `http://localhost:5050/products/${productData.id}`, {
       method: isNewProduct ? 'POST' : 'PUT',
       headers: {
@@ -101,10 +128,16 @@ const App = () => {
           setProducts(updatedProducts);
           setSelectedProductIndex(null);
         }
-        setProductData({ id: null, name: '', price: '', description: '' });
+        // Initialize productData with values from productWebComponents.json
+        const initialProductData = productWebComponents.reduce((acc, curr) => {
+          acc[curr.props.id] = '';
+          return acc;
+        }, { id: null });
+        setProductData(initialProductData);
       })
       .catch(error => console.error('Error saving product:', error));
   };
+  
 
   const handleUserEdit = (index) => {
     setUserData(users[index]);
@@ -117,11 +150,22 @@ const App = () => {
   };
 
   const handleUserClear = () => {
-    setUserData({ id: null, firstName: '', lastName: '', age: '', email: '', address: '' });
+    // Initialize userData with values from webComponents.json
+    const initialUserData = webComponents.reduce((acc, curr) => {
+      acc[curr.props.id] = '';
+      return acc;
+    }, { id: null });
+    setUserData(initialUserData);
   };
+  
 
   const handleProductClear = () => {
-    setProductData({ id: null, name: '', price: '', description: '' });
+    // Initialize productData with values from productWebComponents.json
+    const initialProductData = productWebComponents.reduce((acc, curr) => {
+      acc[curr.props.id] = '';
+      return acc;
+    }, { id: null });
+    setProductData(initialProductData);
   };
 
   const handleTabChange = (tab) => {
