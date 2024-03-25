@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import EntityForm from './EntityForm';
 import EntityTable from './EntityTable';
-
 import { Container, Typography, Grid, Button } from '@mui/material';
+
+const BASE_URL = 'http://localhost:5050';
 
 const App = () => {
   const [userData, setUserData] = useState({});
@@ -16,39 +17,41 @@ const App = () => {
   const [activeTab, setActiveTab] = useState('users');
 
   useEffect(() => {
-    // Fetching data from REST API for users
-    fetch('http://localhost:5050/users')
-      .then(response => response.json())
-      .then(data => {
-        console.log('Data received:', data); // Log the incoming data
-        setUsers(data);
-    })
-      .catch(error => console.error('Error fetching users:', error));
+    if (activeTab === 'users') {
+      // Fetching data from REST API for users
+      fetch(`${BASE_URL}/users`)
+        .then(response => response.json())
+        .then(data => {
+          console.log('Data received:', data); // Log the incoming data
+          setUsers(data);
+        })
+        .catch(error => console.error('Error fetching users:', error));
+        
+      // Fetching data from users.json
+      fetch('/users.json')
+        .then(response => response.json())
+        .then(data => {
+          setWebComponents(data);
+          initializeUserData(data);
+        })
+        .catch(error => console.error('Error fetching user-masterdata:', error));
+    } else if (activeTab === 'products') {
+      // Fetching data from REST API for products
+      fetch(`${BASE_URL}/products`)
+        .then(response => response.json())
+        .then(data => setProducts(data))
+        .catch(error => console.error('Error fetching product-masterdata:', error));
 
-    // Fetching data from REST API for products
-    fetch('http://localhost:5050/products')
-      .then(response => response.json())
-      .then(data => setProducts(data))
-      .catch(error => console.error('Error fetching products:', error));
-
-    // Fetching data from webComponents.json
-    fetch('/webComponents.json')
-      .then(response => response.json())
-      .then(data => {
-        setWebComponents(data);
-        initializeUserData(data);
-      })
-      .catch(error => console.error('Error fetching data:', error));
-
-    // Fetching data from productWebComponents.json
-    fetch('/productWebComponents.json')
-      .then(response => response.json())
-      .then(data => {
-        setProductWebComponents(data);
-        initializeProductData(data);
-      })
-      .catch(error => console.error('Error fetching product data:', error));
-  }, []);
+      // Fetching data from products.json
+      fetch('/products.json')
+        .then(response => response.json())
+        .then(data => {
+          setProductWebComponents(data);
+          initializeProductData(data);
+        })
+        .catch(error => console.error('Error fetching product data:', error));
+    }
+  }, [activeTab]);
 
   const initializeUserData = (data) => {
     const initialUserData = data.reduce((acc, curr) => {
@@ -79,7 +82,7 @@ const App = () => {
     e.preventDefault();
     const isNewUser = userData.id === null;
   
-    fetch(isNewUser ? 'http://localhost:5050/users' : `http://localhost:5050/users/${userData.id}`, {
+    fetch(isNewUser ? `${BASE_URL}/users` :`${BASE_URL}/users/${userData.id}`, {
       method: isNewUser ? 'POST' : 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -111,7 +114,7 @@ const App = () => {
     e.preventDefault();
     const isNewProduct = productData.id === null;
   
-    fetch(isNewProduct ? 'http://localhost:5050/products' : `http://localhost:5050/products/${productData.id}`, {
+    fetch(isNewProduct ? `${BASE_URL}/products` : `${BASE_URL}/products/${productData.id}`, {
       method: isNewProduct ? 'POST' : 'PUT',
       headers: {
         'Content-Type': 'application/json',

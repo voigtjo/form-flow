@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors'); // Import the cors middleware
+const attributes = require('./attributes.json');
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -27,20 +28,18 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 // Define User schema
-const userSchema = new mongoose.Schema({
-  firstName: String,
-  lastName: String,
-  age: Number,
-  email: String,
-  address: String,
-});
+const userSchemaDefinition = {};
+for (const attribute of attributes.userAttributes) {
+  userSchemaDefinition[attribute.name] = mongoose.Schema.Types[attribute.type];
+}
 
+const userSchema = new mongoose.Schema(userSchemaDefinition);
 const User = mongoose.model('User', userSchema);
 
 // Middleware
 app.use(bodyParser.json());
 
-// Routes
+
 // Routes
 app.get('/users', async (req, res) => {
   try {
@@ -59,16 +58,19 @@ app.get('/users', async (req, res) => {
 });
 
 app.post('/users', async (req, res) => {
-  console.log("post user:");
-  console.log(req.body);
-  const user = new User({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    age: req.body.age,
-    email: req.body.email,
-    address: req.body.address,
-  });
+  // Construct user object dynamically using userAttributes
+  const userObj = {};
+  for (const attr of attributes.userAttributes) {
+    // Check if attribute exists in request body and is not empty
+    if (req.body.hasOwnProperty(attr.name) && req.body[attr.name] !== undefined) {
+      userObj[attr.name] = req.body[attr.name];
+    }
+  }
 
+  const user = new User(userObj);
+  console.log("post user:");
+  console.log(userObj);
+  console.log(user);
   try {
     const newUser = await user.save();
     // Convert ObjectId to string for _id field
@@ -82,16 +84,24 @@ app.post('/users', async (req, res) => {
   }
 });
 
+
+
 app.put('/users/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    user.firstName = req.body.firstName;
-    user.lastName = req.body.lastName;
-    user.age = req.body.age;
-    user.email = req.body.email;
-    user.address = req.body.address;
+    // Construct updated user object dynamically using userAttributes
+    const updatedUserObj = {};
+    for (const attr of attributes.userAttributes) {
+      // Check if attribute exists in request body and is not empty
+      if (req.body.hasOwnProperty(attr.name) && req.body[attr.name] !== undefined) {
+        updatedUserObj[attr.name] = req.body[attr.name];
+      }
+    }
+
+    // Update user properties
+    Object.assign(user, updatedUserObj);
 
     const updatedUser = await user.save();
     // Convert ObjectId to string for _id field
@@ -105,6 +115,7 @@ app.put('/users/:id', async (req, res) => {
   }
 });
 
+
 app.delete('/users/:id', async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
@@ -114,13 +125,12 @@ app.delete('/users/:id', async (req, res) => {
   }
 });
 
-// Define Product schema
-const productSchema = new mongoose.Schema({
-  name: String,
-  price: Number,
-  description: String,
-});
+const productSchemaDefinition = {};
+for (const attribute of attributes.productAttributes) {
+  productSchemaDefinition[attribute.name] = mongoose.Schema.Types[attribute.type];
+}
 
+const productSchema = new mongoose.Schema(productSchemaDefinition);
 const Product = mongoose.model('Product', productSchema);
 
 // Routes for Products
@@ -142,11 +152,15 @@ app.get('/products', async (req, res) => {
 });
 
 app.post('/products', async (req, res) => {
-  const product = new Product({
-    name: req.body.name,
-    price: req.body.price,
-    description: req.body.description,
-  });
+  // Construct product object dynamically using productAttributes
+  const productObj = {};
+  for (const attr of attributes.productAttributes) {
+    if (req.body[attr.name]) {
+      productObj[attr.name] = req.body[attr.name];
+    }
+  }
+
+  const product = new Product(productObj);
 
   try {
     const newProduct = await product.save();
@@ -161,14 +175,18 @@ app.post('/products', async (req, res) => {
   }
 });
 
+
 app.put('/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    product.name = req.body.name;
-    product.price = req.body.price;
-    product.description = req.body.description;
+    // Update product attributes dynamically
+    for (const attr of attributes.productAttributes) {
+      if (req.body[attr.name]) {
+        product[attr.name] = req.body[attr.name];
+      }
+    }
 
     const updatedProduct = await product.save();
     // Convert ObjectId to string for _id field
@@ -181,6 +199,7 @@ app.put('/products/:id', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
 
 app.delete('/products/:id', async (req, res) => {
   try {

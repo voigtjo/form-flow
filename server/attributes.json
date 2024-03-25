@@ -1,0 +1,16 @@
+{
+    "userAttributes": [
+      { "name": "firstName", "type": "String" },
+      { "name": "lastName", "type": "String" },
+      { "name": "age", "type": "Number" },
+      { "name": "email", "type": "String" },
+      { "name": "address", "type": "String" }
+    ],
+    "productAttributes": [
+      { "name": "name", "type": "String" },
+      { "name": "price", "type": "Number" },
+      { "name": "description", "type": "String" }
+    ]
+  }
+  
+  
