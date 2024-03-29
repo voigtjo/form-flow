@@ -1,0 +1,14 @@
+{
+    "user": [
+        {"label": "First Name", "props": {"id": "firstName"}},
+        {"label": "Last Name", "props": {"id": "lastName"}},
+        {"label": "Age", "props": {"id": "age", "type": "number"}},
+        {"label": "Email", "props": {"id": "email", "type": "email"}},
+        {"label": "Address", "props": {"id": "address"}}
+      ],
+    "product": [
+        {"label": "Product Name", "props": {"id": "name"}},
+        {"label": "Description", "props": {"id": "description"}},
+        {"label": "Price", "props": {"id": "price", "type": "number"}}
+     ]
+  }

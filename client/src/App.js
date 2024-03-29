@@ -9,7 +9,7 @@ const App = () => {
   const [entityData, setEntityData] = useState({});
   const [entities, setEntities] = useState([]);
   const [selectedEntityIndex, setSelectedEntityIndex] = useState(null);
-  const [webComponents, setWebComponents] = useState([]);
+  const [uiData, setUiData] = useState({});
   const [activeTab, setActiveTab] = useState('user'); // default tab
 
   useEffect(() => {
@@ -27,17 +27,17 @@ const App = () => {
   }, [activeTab]);
 
   useEffect(() => {
-    const fetchWebComponents = async () => {
+    const fetchUiData = async () => {
       try {
-        const response = await fetch(`/${activeTab}.json`);
+        const response = await fetch('/ui.json');
         const data = await response.json();
-        setWebComponents(data);
-        initializeEntityData(data);
+        setUiData(data);
+        initializeEntityData(data[activeTab]);
       } catch (error) {
-        console.error(`Error fetching ${activeTab} masterdata:`, error);
+        console.error(`Error fetching UI data:`, error);
       }
     };
-    fetchWebComponents();
+    fetchUiData();
   }, [activeTab]);
 
   const initializeEntityData = (data) => {
@@ -73,12 +73,14 @@ const App = () => {
           setEntities(updatedEntities);
           setSelectedEntityIndex(null);
         }
-        // Initialize entityData with values from webComponents.json
-        const initialEntityData = webComponents.reduce((acc, curr) => {
-          acc[curr.props.id] = '';
-          return acc;
-        }, { id: null });
-        setEntityData(initialEntityData);
+        // Initialize entityData with values from ui.json if available
+        if (uiData[activeTab]) {
+          const initialEntityData = uiData[activeTab].reduce((acc, curr) => {
+            acc[curr.props.id] = '';
+            return acc;
+          }, { id: null });
+          setEntityData(initialEntityData);
+        }
       })
       .catch(error => console.error(`Error saving ${activeTab}:`, error));
   };
@@ -89,12 +91,14 @@ const App = () => {
   };
 
   const handleClear = () => {
-    // Initialize entityData with values from webComponents.json
-    const initialEntityData = webComponents.reduce((acc, curr) => {
-      acc[curr.props.id] = '';
-      return acc;
-    }, { id: null });
-    setEntityData(initialEntityData);
+    // Initialize entityData with values from ui.json if available
+    if (uiData[activeTab]) {
+      const initialEntityData = uiData[activeTab].reduce((acc, curr) => {
+        acc[curr.props.id] = '';
+        return acc;
+      }, { id: null });
+      setEntityData(initialEntityData);
+    }
   };
 
   const handleTabChange = (tab) => {
@@ -106,20 +110,32 @@ const App = () => {
       <Typography variant="h2" align="center">Form Flow</Typography>
       <Grid container spacing={2}>
         <Grid item xs={3}>
-          <Button onClick={() => handleTabChange('user')} variant={activeTab === 'user' ? 'contained' : 'outlined'} color="primary">User Form</Button>
-          <Button onClick={() => handleTabChange('product')} variant={activeTab === 'product' ? 'contained' : 'outlined'} color="primary">Product Form</Button>
+          {Object.keys(uiData).map((tab, index) => (
+            <Button
+              key={index}
+              onClick={() => handleTabChange(tab)}
+              variant={activeTab === tab ? 'contained' : 'outlined'}
+              color="primary"
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
+            </Button>
+          ))}
         </Grid>
         <Grid item xs={9}>
-          <EntityForm
-            id={entityData.id}
-            components={webComponents}
-            onInputChange={handleInputChange}
-            onSubmit={handleSubmit}
-            onClear={handleClear}
-            data={entityData}
-            name={activeTab}
-          />
-          <EntityTable entities={entities} onEdit={handleEdit} tableColumns={webComponents} name={activeTab}/>
+          {uiData[activeTab] && (
+            <EntityForm
+              id={entityData.id}
+              components={uiData[activeTab]}
+              onInputChange={handleInputChange}
+              onSubmit={handleSubmit}
+              onClear={handleClear}
+              data={entityData}
+              name={activeTab}
+            />
+          )}
+          {uiData[activeTab] && (
+            <EntityTable entities={entities} onEdit={handleEdit} tableColumns={uiData[activeTab]} name={activeTab}/>
+          )}
         </Grid>
       </Grid>
     </Container>
