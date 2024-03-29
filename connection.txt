@@ -1,0 +1,2 @@
+mongoimport --uri "mongodb+srv://cluster0.mt46oab.mongodb.net/" --username joevoi --db=employees --collection=uielements --file=ui-import.json --jsonArray
+mongoimport --uri "mongodb+srv://cluster0.mt46oab.mongodb.net/" --username joevoi --db=employees --collection=attributes --file=attributes.json --jsonArray

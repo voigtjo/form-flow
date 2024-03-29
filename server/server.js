@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const Attribute = require('./models/Attribute'); // Import the Attribute model
+const UIElement = require('./models/UIElement'); // Import the UIElement model
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -45,22 +46,26 @@ async function initializeSchemas() {
   try {
     const fetchedAttributes = await fetchAttributes();
     const schemas = {};
-    
+
     // Iterate over fetched attributes to define schemas
     for (const attribute of fetchedAttributes) {
       const { entity, name, type } = attribute;
       if (!schemas[entity]) {
         schemas[entity] = {};
       }
-      schemas[entity][name] = mongoose.Schema.Types[type];
+      if (!mongoose.models[name.capitalize()]) { // Check if model already exists
+        schemas[entity][name] = mongoose.Schema.Types[type];
+      }
     }
-    
+
     // Define mongoose models based on schemas
     for (const entityName in schemas) {
       const capitalizedEntityName = entityName.capitalize();
-      mongoose.model(capitalizedEntityName, new mongoose.Schema(schemas[entityName]));
+      if (!mongoose.models[capitalizedEntityName]) { // Check if model already exists
+        mongoose.model(capitalizedEntityName, new mongoose.Schema(schemas[entityName]));
+      }
     }
-    
+
     return schemas;
   } catch (error) {
     console.error('Error initializing schemas:', error);
@@ -78,6 +83,29 @@ initializeSchemas()
     console.error('Failed to initialize schemas:', error);
     process.exit(1);
   });
+
+// Fetch UI elements from MongoDB
+async function fetchUIElements() {
+  try {
+    const uiElements = await UIElement.find();
+    return uiElements;
+  } catch (error) {
+    console.error('Error fetching UI elements:', error);
+    throw error;
+  }
+}
+
+// Route for fetching UI elements
+app.get('/ui-elements', async (req, res) => {
+  try {
+    const uiElements = await fetchUIElements();
+    res.json(uiElements);
+    console.log('Fetched UI elements:', uiElements);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 // Generic route for fetching entities
 app.get('/:entity', async (req, res) => {

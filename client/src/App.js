@@ -9,7 +9,7 @@ const App = () => {
   const [entityData, setEntityData] = useState({});
   const [entities, setEntities] = useState([]);
   const [selectedEntityIndex, setSelectedEntityIndex] = useState(null);
-  const [uiData, setUiData] = useState({});
+  const [uiElements, setUiElements] = useState([]);
   const [activeTab, setActiveTab] = useState('user'); // default tab
 
   useEffect(() => {
@@ -27,17 +27,17 @@ const App = () => {
   }, [activeTab]);
 
   useEffect(() => {
-    const fetchUiData = async () => {
+    const fetchUiElements = async () => {
       try {
-        const response = await fetch('/ui.json');
+        const response = await fetch(`${BASE_URL}/ui-elements`);
         const data = await response.json();
-        setUiData(data);
-        initializeEntityData(data[activeTab]);
+        setUiElements(data);
+        initializeEntityData(data.filter(element => element.entity === activeTab));
       } catch (error) {
-        console.error(`Error fetching UI data:`, error);
+        console.error(`Error fetching UI elements:`, error);
       }
     };
-    fetchUiData();
+    fetchUiElements();
   }, [activeTab]);
 
   const initializeEntityData = (data) => {
@@ -55,7 +55,7 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const isNewEntity = entityData.id === null;
-  
+
     fetch(isNewEntity ? `${BASE_URL}/${activeTab}` : `${BASE_URL}/${activeTab}/${entityData.id}`, {
       method: isNewEntity ? 'POST' : 'PUT',
       headers: {
@@ -73,9 +73,10 @@ const App = () => {
           setEntities(updatedEntities);
           setSelectedEntityIndex(null);
         }
-        // Initialize entityData with values from ui.json if available
-        if (uiData[activeTab]) {
-          const initialEntityData = uiData[activeTab].reduce((acc, curr) => {
+        // Initialize entityData with values from ui-elements if available
+        const filteredElements = uiElements.filter(element => element.entity === activeTab);
+        if (filteredElements.length > 0) {
+          const initialEntityData = filteredElements.reduce((acc, curr) => {
             acc[curr.props.id] = '';
             return acc;
           }, { id: null });
@@ -84,16 +85,17 @@ const App = () => {
       })
       .catch(error => console.error(`Error saving ${activeTab}:`, error));
   };
-  
+
   const handleEdit = (index) => {
     setEntityData(entities[index]);
     setSelectedEntityIndex(index);
   };
 
   const handleClear = () => {
-    // Initialize entityData with values from ui.json if available
-    if (uiData[activeTab]) {
-      const initialEntityData = uiData[activeTab].reduce((acc, curr) => {
+    // Initialize entityData with values from ui-elements if available
+    const filteredElements = uiElements.filter(element => element.entity === activeTab);
+    if (filteredElements.length > 0) {
+      const initialEntityData = filteredElements.reduce((acc, curr) => {
         acc[curr.props.id] = '';
         return acc;
       }, { id: null });
@@ -110,7 +112,7 @@ const App = () => {
       <Typography variant="h2" align="center">Form Flow</Typography>
       <Grid container spacing={2}>
         <Grid item xs={3}>
-          {Object.keys(uiData).map((tab, index) => (
+          {Array.from(new Set(uiElements.map(element => element.entity))).map((tab, index) => (
             <Button
               key={index}
               onClick={() => handleTabChange(tab)}
@@ -122,10 +124,10 @@ const App = () => {
           ))}
         </Grid>
         <Grid item xs={9}>
-          {uiData[activeTab] && (
+          {uiElements.filter(element => element.entity === activeTab).length > 0 && (
             <EntityForm
               id={entityData.id}
-              components={uiData[activeTab]}
+              components={uiElements.filter(element => element.entity === activeTab)}
               onInputChange={handleInputChange}
               onSubmit={handleSubmit}
               onClear={handleClear}
@@ -133,8 +135,8 @@ const App = () => {
               name={activeTab}
             />
           )}
-          {uiData[activeTab] && (
-            <EntityTable entities={entities} onEdit={handleEdit} tableColumns={uiData[activeTab]} name={activeTab}/>
+          {uiElements.filter(element => element.entity === activeTab).length > 0 && (
+            <EntityTable entities={entities} onEdit={handleEdit} tableColumns={uiElements.filter(element => element.entity === activeTab)} name={activeTab}/>
           )}
         </Grid>
       </Grid>
