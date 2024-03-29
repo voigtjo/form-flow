@@ -1,0 +1,14 @@
+{"_id":{"$oid":"66031ece905c19cf14b05fe5"},"name":"firstName","type":"String","entity":"user"}
+{"_id":{"$oid":"66031eeb905c19cf14b0dd19"},"name":"lastName","type":"String","entity":"user"}
+{"_id":{"$oid":"66031eff905c19cf14b139b7"},"name":"age","type":"Number","entity":"user"}
+{"_id":{"$oid":"66031f15905c19cf14b19a4e"},"name":"email","type":"String","entity":"user"}
+{"_id":{"$oid":"66031f2e905c19cf14b2762e"},"name":"address","type":"String","entity":"user"}
+{"_id":{"$oid":"66031f44905c19cf14b2d526"},"name":"name","type":"String","entity":"product"}
+{"_id":{"$oid":"66031f58905c19cf14b32ba1"},"name":"price","type":"Number","entity":"product"}
+{"_id":{"$oid":"66031f6b905c19cf14b378b9"},"name":"description","type":"String","entity":"product"}
+{"_id":{"$oid":"6606f7c942a1ca5ae542d8f2"},"name":"name","type":"String","entity":"attribute"}
+{"_id":{"$oid":"6606f88d42a1ca5ae542d8f3"},"name":"type","type":"String","entity":"attribute"}
+{"_id":{"$oid":"6606f8c642a1ca5ae542d8f4"},"name":"entity","type":"String","entity":"attribute"}
+{"_id":{"$oid":"6606fde542a1ca5ae542d8f8"},"name":"name","type":"String","entity":"record"}
+{"_id":{"$oid":"6606fe3242a1ca5ae542d8fa"},"name":"position","type":"String","entity":"record"}
+{"_id":{"$oid":"6606fe5542a1ca5ae542d8fb"},"name":"level","type":"String","entity":"record"}
