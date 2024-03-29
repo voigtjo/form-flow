@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import EntityForm from './EntityForm';
 import EntityTable from './EntityTable';
-import { Container, Typography, Grid, Button } from '@mui/material';
+import { Container, Typography, Grid, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 const BASE_URL = 'http://localhost:5050';
 
@@ -118,6 +118,7 @@ const App = () => {
               onClick={() => handleTabChange(tab)}
               variant={activeTab === tab ? 'contained' : 'outlined'}
               color="primary"
+              fullWidth // Ensure the button takes full width
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
             </Button>
@@ -136,7 +137,31 @@ const App = () => {
             />
           )}
           {uiElements.filter(element => element.entity === activeTab).length > 0 && (
-            <EntityTable entities={entities} onEdit={handleEdit} tableColumns={uiElements.filter(element => element.entity === activeTab)} name={activeTab}/>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    {uiElements.filter(element => element.entity === activeTab).map((element, index) => (
+                      <TableCell key={index}>{element.label}</TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {entities.map((entity, index) => (
+                    <TableRow key={index}>
+                      {uiElements.filter(element => element.entity === activeTab).map((element, index) => (
+                        <TableCell key={index}>{entity[element.props.id]}</TableCell>
+                      ))}
+                      <TableCell>
+                        <Button onClick={() => handleEdit(index)} variant="outlined" color="primary">
+                          Edit
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
         </Grid>
       </Grid>
