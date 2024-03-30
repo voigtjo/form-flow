@@ -152,6 +152,7 @@ const App = () => {
           </div>
         </Grid>
         <Grid item xs={9}>
+        <Box mt={4} mb={4}> {/* Add margin top and bottom for spacing */}
           {uiElements.filter(element => element.entity === activeTab).length > 0 && (
             <EntityForm
               id={entityData.id}
@@ -163,7 +164,7 @@ const App = () => {
               name={activeTab}
             />
           )}
-          <Box mt={4}> {/* Add margin top for spacing */}
+          </Box>
             {uiElements.filter(element => element.entity === activeTab).length > 0 && (
               <TableContainer component={Paper}>
                 <EntityTable
@@ -177,7 +178,6 @@ const App = () => {
                 />
               </TableContainer>
             )}
-          </Box>
         </Grid>
       </Grid>
     </Container>
