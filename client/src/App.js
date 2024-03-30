@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import EntityForm from './EntityForm';
 import EntityTable from './EntityTable';
-import { Container, Typography, Grid, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Container, Typography, Grid, Button, TableContainer, Paper, Box } from '@mui/material';
 
 const BASE_URL = 'http://localhost:5050';
 
@@ -11,6 +11,7 @@ const App = () => {
   const [selectedEntityIndex, setSelectedEntityIndex] = useState(null);
   const [uiElements, setUiElements] = useState([]);
   const [activeTab, setActiveTab] = useState('user'); // default tab
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,11 +39,12 @@ const App = () => {
       }
     };
     fetchUiElements();
+    setSearchTerm(''); // Reset searchTerm when activeTab changes
   }, [activeTab]);
 
   const initializeEntityData = (data) => {
     const initialEntityData = data.reduce((acc, curr) => {
-      acc[curr.props.id] = '';
+      acc[curr.entityid] = ''; // Use entityid instead of id
       return acc;
     }, { id: null });
     setEntityData(initialEntityData);
@@ -77,7 +79,7 @@ const App = () => {
         const filteredElements = uiElements.filter(element => element.entity === activeTab);
         if (filteredElements.length > 0) {
           const initialEntityData = filteredElements.reduce((acc, curr) => {
-            acc[curr.props.id] = '';
+            acc[curr.entityid] = ''; // Use entityid instead of id
             return acc;
           }, { id: null });
           setEntityData(initialEntityData);
@@ -96,7 +98,7 @@ const App = () => {
     const filteredElements = uiElements.filter(element => element.entity === activeTab);
     if (filteredElements.length > 0) {
       const initialEntityData = filteredElements.reduce((acc, curr) => {
-        acc[curr.props.id] = '';
+        acc[curr.entityid] = ''; // Use entityid instead of id
         return acc;
       }, { id: null });
       setEntityData(initialEntityData);
@@ -109,20 +111,45 @@ const App = () => {
 
   return (
     <Container>
-      <Typography variant="h2" align="center">Form Flow</Typography>
+      <Typography variant="h3" align="center">Form Flow</Typography>
       <Grid container spacing={2}>
         <Grid item xs={3}>
-          {Array.from(new Set(uiElements.map(element => element.entity))).map((tab, index) => (
-            <Button
-              key={index}
-              onClick={() => handleTabChange(tab)}
-              variant={activeTab === tab ? 'contained' : 'outlined'}
-              color="primary"
-              fullWidth // Ensure the button takes full width
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
-            </Button>
-          ))}
+          <div>
+            <Typography variant="h5" style={{ marginTop: '16px' }}>Admin Panel</Typography>
+            {Array.from(new Set(uiElements.map(element => element.entity)))
+              .filter(tab => tab === 'attribute' || tab === 'uielement')
+              .map((tab, index) => {
+                return (
+                  <Button
+                    key={index}
+                    onClick={() => handleTabChange(tab)}
+                    variant={activeTab === tab ? 'contained' : 'outlined'}
+                    color="primary"
+                    fullWidth // Ensure the button takes full width
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
+                  </Button>
+                );
+              })}
+          </div>
+          <div>
+            <Typography variant="h5" style={{ marginTop: '16px' }}>User Panel</Typography>
+            {Array.from(new Set(uiElements.map(element => element.entity)))
+              .filter(tab => tab !== 'attribute' && tab !== 'uielement')
+              .map((tab, index) => {
+                return (
+                  <Button
+                    key={index}
+                    onClick={() => handleTabChange(tab)}
+                    variant={activeTab === tab ? 'contained' : 'outlined'}
+                    color="primary"
+                    fullWidth // Ensure the button takes full width
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
+                  </Button>
+                );
+              })}
+          </div>
         </Grid>
         <Grid item xs={9}>
           {uiElements.filter(element => element.entity === activeTab).length > 0 && (
@@ -136,33 +163,21 @@ const App = () => {
               name={activeTab}
             />
           )}
-          {uiElements.filter(element => element.entity === activeTab).length > 0 && (
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    {uiElements.filter(element => element.entity === activeTab).map((element, index) => (
-                      <TableCell key={index}>{element.label}</TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {entities.map((entity, index) => (
-                    <TableRow key={index}>
-                      {uiElements.filter(element => element.entity === activeTab).map((element, index) => (
-                        <TableCell key={index}>{entity[element.props.id]}</TableCell>
-                      ))}
-                      <TableCell>
-                        <Button onClick={() => handleEdit(index)} variant="outlined" color="primary">
-                          Edit
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
+          <Box mt={4}> {/* Add margin top for spacing */}
+            {uiElements.filter(element => element.entity === activeTab).length > 0 && (
+              <TableContainer component={Paper}>
+                <EntityTable
+                  entities={entities}
+                  onEdit={handleEdit}
+                  tableColumns={uiElements.filter(element => element.entity === activeTab)}
+                  name={activeTab}
+                  searchTerm={searchTerm} // Pass searchTerm to EntityTable
+                  setSearchTerm={setSearchTerm} // Pass setSearchTerm to EntityTable
+                  onTabChange={handleTabChange} // Pass handleTabChange to EntityTable
+                />
+              </TableContainer>
+            )}
+          </Box>
         </Grid>
       </Grid>
     </Container>

@@ -20,9 +20,8 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
               fullWidth
               variant="outlined"
               label={component.label}
-              onChange={(e) => onInputChange(e.target.value, component.props.id)}
-              value={data ? data[component.props.id] || '' : ''}
-              {...component.props}
+              onChange={(e) => onInputChange(e.target.value, component.entityid)}
+              value={data ? data[component.entityid] || '' : ''}
             />
           </Grid>
         ))}

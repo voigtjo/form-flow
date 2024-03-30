@@ -12,3 +12,7 @@
 {"_id":{"$oid":"6606fde542a1ca5ae542d8f8"},"name":"name","type":"String","entity":"record"}
 {"_id":{"$oid":"6606fe3242a1ca5ae542d8fa"},"name":"position","type":"String","entity":"record"}
 {"_id":{"$oid":"6606fe5542a1ca5ae542d8fb"},"name":"level","type":"String","entity":"record"}
+{"_id":{"$oid":"6607d6db5d7787bd3fab1263"},"name":"label","type":"String","entity":"uielement"}
+{"_id":{"$oid":"6607d6f05d7787bd3fab1265"},"name":"entity","type":"String","entity":"uielement"}
+{"_id":{"$oid":"6607d7005d7787bd3fab1267"},"name":"type","type":"String","entity":"uielement"}
+{"_id":{"$oid":"6607d7135d7787bd3fab1269"},"name":"entityid","type":"String","entity":"uielement"}

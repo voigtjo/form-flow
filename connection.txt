@@ -1,5 +1,5 @@
-mongoimport --uri "URL" --username "username" --db=employees --collection=uielements --file=ui-import.json --jsonArray
+mongoimport --uri "URL" --username "username" --db=employees --collection=uielements --file=uielements.json --jsonArray
 mongoimport --uri "URL" --username "username" --db=employees --collection=attributes --file=attributes.json --jsonArray
 
-mongoexport --uri="URL" --username "username" --db=employees --collection=attributes  --out=attributes.json
 mongoexport --uri="URL" --username "username" --db=employees --collection=uielements  --out=uielements.json
+mongoexport --uri="URL" --username "username" --db=employees --collection=attributes  --out=attributes.json

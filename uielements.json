@@ -1,14 +1,18 @@
-{"_id":{"$oid":"6606ea9f5858d5bb1ded692b"},"label":"Email","props":{"id":"email","type":"email"},"entity":"user"}
-{"_id":{"$oid":"6606ea9f5858d5bb1ded6926"},"label":"First Name","props":{"id":"firstName"},"entity":"user"}
-{"_id":{"$oid":"6606ea9f5858d5bb1ded692a"},"label":"Product Name","props":{"id":"name"},"entity":"product"}
-{"_id":{"$oid":"6606ea9f5858d5bb1ded6928"},"label":"Description","props":{"id":"description"},"entity":"product"}
-{"_id":{"$oid":"6606ea9f5858d5bb1ded6929"},"label":"Address","props":{"id":"address"},"entity":"user"}
-{"_id":{"$oid":"6606ea9f5858d5bb1ded692c"},"label":"Last Name","props":{"id":"lastName"},"entity":"user"}
-{"_id":{"$oid":"6606ea9f5858d5bb1ded6927"},"label":"Age","props":{"id":"age","type":"number"},"entity":"user"}
-{"_id":{"$oid":"6606ea9f5858d5bb1ded692d"},"label":"Price","props":{"id":"price","type":"number"},"entity":"product"}
-{"_id":{"$oid":"6606f91742a1ca5ae542d8f5"},"label":"Name","props":{"id":"name","type":"String"},"entity":"attribute"}
-{"_id":{"$oid":"6606f9a142a1ca5ae542d8f6"},"label":"Type","props":{"id":"type","type":"String"},"entity":"attribute"}
-{"_id":{"$oid":"6606fa0142a1ca5ae542d8f7"},"label":"Entity","props":{"id":"entity","type":"String"},"entity":"attribute"}
-{"_id":{"$oid":"6606fe9242a1ca5ae542d8fc"},"label":"Name","props":{"id":"name","type":"String"},"entity":"record"}
-{"_id":{"$oid":"6606feff42a1ca5ae542d8fd"},"label":"Position","props":{"id":"position","type":"String"},"entity":"record"}
-{"_id":{"$oid":"6606ff6f42a1ca5ae542d8fe"},"label":"Level","props":{"id":"level","type":"String"},"entity":"record"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd6"},"label":"Price","type":"number","entity":"product","entityid":"price"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd7"},"label":"Name","type":"String","entity":"attribute","entityid":"name"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd8"},"label":"Type","type":"String","entity":"attribute","entityid":"type"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd9"},"label":"Last Name","entity":"user","type":"String","entityid":"lastName"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bda"},"label":"Name","type":"String","entity":"record","entityid":"name"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdb"},"label":"Entity","type":"String","entity":"attribute","entityid":"entity"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdc"},"label":"Position","type":"String","entity":"record","entityid":"position"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdd"},"label":"Level","type":"String","entity":"record","entityid":"level"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bde"},"label":"Description","entity":"product","type":"String","entityid":"description"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdf"},"label":"First Name","entity":"user","type":"String","entityid":"firstName"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1be0"},"label":"Product Name","entity":"product","type":"String","entityid":"name"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1be1"},"label":"Address","entity":"user","type":"String","entityid":"address"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1be2"},"label":"Age","type":"number","entity":"user","entityid":"age"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1be3"},"label":"Email","type":"email","entity":"user","entityid":"email"}
+{"_id":{"$oid":"6607d7811aa57a7355fa55d0"},"label":"Label","type":"String","entity":"uielement","entityid":"label"}
+{"_id":{"$oid":"6607d7be1aa57a7355fa55d1"},"label":"Type","type":"String","entity":"uielement","entityid":"type"}
+{"_id":{"$oid":"6607d8111aa57a7355fa55d2"},"label":"Entity","type":"String","entity":"uielement","entityid":"entity"}
+{"_id":{"$oid":"6607d84b1aa57a7355fa55d3"},"label":"EntityId","type":"String","entity":"uielement","entityid":"entityid"}
