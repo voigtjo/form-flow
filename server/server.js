@@ -128,6 +128,25 @@ app.get('/:entity', async (req, res) => {
   }
 });
 
+// Route for finding a dataset by ID
+app.get('/:entity/:id', async (req, res) => {
+  const { entity, id } = req.params;
+  try {
+    if (!schemas || !schemas[entity]) {
+      return res.status(404).json({ message: `Schema for ${entity} not found` });
+    }
+    
+    const EntityModel = mongoose.models[entity.capitalize()] || mongoose.model(entity.capitalize(), new mongoose.Schema(schemas[entity]));
+    const dataset = await EntityModel.findById(id);
+    if (!dataset) return res.status(404).json({ message: `${entity.capitalize()} not found` });
+    
+    res.json(dataset);
+    console.log(`Found ${entity} by ID ${id}:`, dataset);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Generic route for creating entities
 app.post('/:entity', async (req, res) => {
   const { entity } = req.params;

@@ -1,7 +1,10 @@
+// EntityForm.js
 import React from 'react';
 import { Grid, TextField, Button, Typography } from '@mui/material';
 
 const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, name }) => {
+  console.log('Received data in EntityForm:', data); // Debugging statement
+
   const isNewRecord = !id;
 
   const handleClear = () => {
@@ -12,9 +15,9 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
     <form onSubmit={onSubmit}>
       <Grid container spacing={2} style={{ marginTop: '32px' }}>
         <Grid item xs={12}>
-        <Typography variant="h6">{isNewRecord ? 'New '+ name : 'Update ' + name}</Typography>
+          <Typography variant="h6">{isNewRecord ? 'New ' + name : 'Update ' + name}</Typography>
         </Grid>
-        {components.map((component, index) => (
+        {components && components.map((component, index) => (
           <Grid key={index} item xs={12}>
             <TextField
               fullWidth
