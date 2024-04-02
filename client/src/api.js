@@ -14,11 +14,8 @@ export const fetchData = async (tab) => {
 };
 export const fetchEntityById = async (entity, id) => {
   try {
-    //console.log("url=" + `${BASE_URL}/${entity}/${id}`);
     const response = await fetch(`${BASE_URL}/${entity}/${id}`);
     const data = await response.json();
-    //console.log("data:");
-    //console.log(data);
     return data;
   } catch (error) {
     console.error(`Error fetching ${entity} by ID ${id}:`, error);

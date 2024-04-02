@@ -10,8 +10,8 @@ const App = () => {
       <Typography variant="h3" align="center">Form Flow</Typography>
       <Router>
         <Routes>
-          {/* Route for EntityFormWrapper 
-          <Route path="/:entity/:entityId" element={<EntityFormWrapper />} />*/}
+          {/* Route for EntityFormWrapper */}
+          <Route path="/:entity/:entityId" element={<EntityFormWrapper />} />
 
           {/* Route for the main page */}
           <Route path="/" element={<MainPage />} />

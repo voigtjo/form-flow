@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Grid, Button, TableContainer, Paper, Box, TextField } from '@mui/material';
+import { Typography, Grid, Button, TableContainer, Paper, Box } from '@mui/material';
 import EntityForm from './EntityForm';
 import EntityTable from './EntityTable';
-import { fetchData, postData, updateData, deleteData } from './api'; // Import API functions
+import { postData, updateData } from './api'; // Import API functions
+import * as functions from './functions'; // Import functions
 
 const MainPage = () => {
   const [entityData, setEntityData] = useState({});
@@ -13,89 +14,33 @@ const MainPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const fetchDataForTab = async () => {
-      try {
-        const data = await fetchData(activeTab); // Fetch user data
-        setEntities(data);
-        console.log(`Data received for ${activeTab}:`, data);
-      } catch (error) {
-        console.error(`Error fetching ${activeTab}:`, error);
-      }
-    };
-    fetchDataForTab();
+    functions.fetchDataForTab(activeTab, setEntities);
   }, [activeTab]);
 
   useEffect(() => {
-    const fetchUiElements = async () => {
-      try {
-        const data = await fetchData('ui-elements');
-        setUiElements(data);
-        initializeEntityData(data.filter(element => element.entity === activeTab));
-      } catch (error) {
-        console.error(`Error fetching UI elements:`, error);
-      }
-    };
-    fetchUiElements();
-    setSearchTerm(''); // Reset searchTerm when activeTab changes
+    functions.fetchUiElements(activeTab, setUiElements, initializeEntityData, setSearchTerm);
+    setSearchTerm('');
   }, [activeTab]);
 
   const initializeEntityData = (data) => {
-    const initialEntityData = data.reduce((acc, curr) => {
-      acc[curr.entityid] = ''; // Use entityid instead of id
-      return acc;
-    }, { id: null });
-    setEntityData(initialEntityData);
+    functions.initializeEntityData(data, setEntityData);
   };
 
   const handleInputChange = (value, key) => {
-    setEntityData({ ...entityData, [key]: value });
+    functions.handleInputChange(value, key, entityData, setEntityData);
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const isNewEntity = entityData.id === null;
-
-    const endpoint = isNewEntity ? activeTab : `${activeTab}/${entityData.id}`;
-    const apiFunction = isNewEntity ? postData : updateData;
-
-    apiFunction(endpoint, entityData)
-      .then(data => {
-        if (isNewEntity) {
-          setEntities([...entities, data]);
-        } else {
-          const updatedEntities = [...entities];
-          updatedEntities[selectedEntityIndex] = data;
-          setEntities(updatedEntities);
-          setSelectedEntityIndex(null);
-        }
-        // Initialize entityData with values from ui-elements if available
-        const filteredElements = uiElements.filter(element => element.entity === activeTab);
-        if (filteredElements.length > 0) {
-          const initialEntityData = filteredElements.reduce((acc, curr) => {
-            acc[curr.entityid] = ''; // Use entityid instead of id
-            return acc;
-          }, { id: null });
-          setEntityData(initialEntityData);
-        }
-      })
-      .catch(error => console.error(`Error saving ${activeTab}:`, error));
+    functions.handleSubmit(e, entityData.id === null, activeTab, entityData, entities, setEntities, selectedEntityIndex, setSelectedEntityIndex, uiElements, setEntityData, postData, updateData, setSearchTerm);
   };
 
   const handleEdit = (index) => {
-    setEntityData(entities[index]);
-    setSelectedEntityIndex(index);
+    functions.handleEdit(index, activeTab, entities, setEntityData, setSelectedEntityIndex);
   };
+  
 
   const handleClear = () => {
-    // Initialize entityData with values from ui-elements if available
-    const filteredElements = uiElements.filter(element => element.entity === activeTab);
-    if (filteredElements.length > 0) {
-      const initialEntityData = filteredElements.reduce((acc, curr) => {
-        acc[curr.entityid] = ''; // Use entityid instead of id
-        return acc;
-      }, { id: null });
-      setEntityData(initialEntityData);
-    }
+    functions.handleClear(activeTab, uiElements, setEntityData);
   };
 
   const handleTabChange = (tab) => {
@@ -103,18 +48,15 @@ const MainPage = () => {
   };
 
   const handleSearch = (event) => {
-    const { value } = event.target;
-    setSearchTerm(value);
+    functions.handleSearch(event, setSearchTerm);
   };
-  
 
   const filteredEntities = entities.filter(entity => {
-    // Filter by search term
     return Object.values(entity).some(value =>
       value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
-  
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={3}>
@@ -129,7 +71,7 @@ const MainPage = () => {
                   onClick={() => handleTabChange(tab)}
                   variant={activeTab === tab ? 'contained' : 'outlined'}
                   color="primary"
-                  fullWidth // Ensure the button takes full width
+                  fullWidth
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
                 </Button>
@@ -147,7 +89,7 @@ const MainPage = () => {
                   onClick={() => handleTabChange(tab)}
                   variant={activeTab === tab ? 'contained' : 'outlined'}
                   color="primary"
-                  fullWidth // Ensure the button takes full width
+                  fullWidth
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
                 </Button>
@@ -156,7 +98,7 @@ const MainPage = () => {
         </div>
       </Grid>
       <Grid item xs={9}>
-        <Box mt={4} mb={4}> {/* Add margin top and bottom for spacing */}
+        <Box mt={4} mb={4}>
           {uiElements.filter(element => element.entity === activeTab).length > 0 && (
             <EntityForm
               id={entityData.id}
@@ -176,9 +118,9 @@ const MainPage = () => {
               onEdit={handleEdit}
               tableColumns={uiElements.filter(element => element.entity === activeTab)}
               name={activeTab}
-              searchTerm={searchTerm} // Pass searchTerm to EntityTable
-              setSearchTerm={setSearchTerm} // Pass setSearchTerm to EntityTable
-              onTabChange={handleTabChange} // Pass handleTabChange to EntityTable
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              onTabChange={handleTabChange}
             />
           </TableContainer>
         )}
