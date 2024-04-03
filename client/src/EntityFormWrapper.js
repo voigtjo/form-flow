@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Box } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { Grid, Box, Button } from '@mui/material';
+import { useParams, useNavigate } from 'react-router-dom';
 import EntityForm from './EntityForm';
 import { postData, updateData, fetchEntityById } from './api'; // Import API functions
 import * as functions from './functions'; // Import functions
@@ -9,6 +9,7 @@ const EntityFormWrapper = () => {
   const { entity, entityId } = useParams();
   const [uiElements, setUiElements] = useState([]);
   const [entityData, setEntityData] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch data for entity and initialize UI elements
@@ -49,10 +50,18 @@ const EntityFormWrapper = () => {
     functions.handleClear(entity, uiElements, setEntityData);
   };
 
+  const handleBack = () => {
+    // Navigate back to the MainPage with the same activeTab selected
+    navigate(`/?activeTab=${entity}`);
+  };
+  
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Box mt={4} mb={4}>
+          {/* Back button */}
+          <Button variant="outlined" color="primary" onClick={handleBack}>Back</Button>
           <EntityForm
             id={entityId}
             components={uiElements.filter(element => element.entity === entity)}

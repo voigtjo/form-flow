@@ -2,6 +2,17 @@
 
 const BASE_URL = 'http://localhost:5050'; // Replace this with your actual API base URL
 
+export const fetchUiElements = async (entity) => {
+  try {
+    const response = await fetch(`${BASE_URL}/ui-elements/${entity}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(`Error fetching UI elements for ${entity}:`, error);
+    throw error;
+  }
+};
+
 export const fetchData = async (tab) => {
   const url = tab === 'user' ? 'http://localhost:5050/user' : `http://localhost:5050/${tab}`;
   try {
@@ -12,6 +23,7 @@ export const fetchData = async (tab) => {
     throw new Error(`Error fetching ${tab} data: ${error.message}`);
   }
 };
+
 export const fetchEntityById = async (entity, id) => {
   try {
     const response = await fetch(`${BASE_URL}/${entity}/${id}`);
@@ -33,6 +45,8 @@ export const postData = async (endpoint, body) => {
       body: JSON.stringify(body),
     });
     const responseData = await response.json();
+    console.log("postData: endpoint= " + responseData);
+    console.log(responseData);
     return responseData;
   } catch (error) {
     console.error('Error posting data:', error);

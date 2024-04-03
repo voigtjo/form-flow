@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-const EntityTable = ({ entities, onEdit, tableColumns, name, activeTab, searchTerm, setSearchTerm }) => {
+const EntityTable = ({ entities, tableColumns, activeTab, searchTerm, setSearchTerm }) => {
+  console.log("EntityTable: activeTab= " + activeTab)
   const [sortBy, setSortBy] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
+  const navigate = useNavigate(); // Add useNavigate hook
 
   useEffect(() => {
     setSearchTerm('');
@@ -42,6 +45,12 @@ const EntityTable = ({ entities, onEdit, tableColumns, name, activeTab, searchTe
     return searchMatches;
   });
 
+  const handleEdit = (entityId) => {
+    console.log("handleEdit: activeTab= " + activeTab + ", entityId= " + entityId);
+    // Navigate to EntityFormWrapper with the appropriate parameters
+    navigate(`/${activeTab}/${entityId}`);
+  };
+
   return (
     <Box pt={2}>
       <TextField
@@ -76,7 +85,8 @@ const EntityTable = ({ entities, onEdit, tableColumns, name, activeTab, searchTe
                     <TableCell key={column.entityid}>{entity[column.entityid]}</TableCell>
                   ))}
                   <TableCell>
-                    <Button onClick={() => onEdit(index)} variant="outlined" color="primary">
+                    {/* Pass entityId to handleEdit function */}
+                    <Button onClick={() => handleEdit(entity.id)} variant="outlined" color="primary">
                       Edit
                     </Button>
                   </TableCell>

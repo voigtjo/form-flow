@@ -14,6 +14,8 @@ export const fetchDataForTab = async (activeTab, setEntities) => {
 export const fetchUiElements = async (activeTab, setUiElements, initializeEntityData, setSearchTerm) => {
   try {
     const data = await fetchData('ui-elements');
+    console.log("fetchUiElements: data=");
+    console.log(data);
     setUiElements(data);
     initializeEntityData(data.filter(element => element.entity === activeTab));
   } catch (error) {
@@ -80,6 +82,32 @@ export const handleEdit = async (index, entity, entities, setEntityData, setSele
     console.error(`Error handling edit:`, error);
   }
 };
+
+export const handleNewEntity = async (activeTab, uiElements, postData) => {
+  try {
+    // Create an empty entity object with id set to null
+    const emptyEntity = { id: null };
+
+    // Filter UI elements for the active tab
+    const filteredUiElements = uiElements.filter(element => element.entity === activeTab);
+
+    // Initialize empty entity with properties from UI elements
+    filteredUiElements.forEach(element => {
+      emptyEntity[element.entityid] = '';
+    });
+
+    // Submit postData with the empty entity
+    const newEntity = await postData(activeTab, emptyEntity);
+    
+    return newEntity;
+  } catch (error) {
+    console.error('Error creating new entity:', error);
+    throw error;
+  }
+};
+
+
+
 
 
 export const handleClear = (activeTab, uiElements, setEntityData) => {
