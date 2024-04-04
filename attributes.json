@@ -16,3 +16,6 @@
 {"_id":{"$oid":"6607d6f05d7787bd3fab1265"},"name":"entity","type":"String","entity":"uielement"}
 {"_id":{"$oid":"6607d7005d7787bd3fab1267"},"name":"type","type":"String","entity":"uielement"}
 {"_id":{"$oid":"6607d7135d7787bd3fab1269"},"name":"entityid","type":"String","entity":"uielement"}
+{"_id":{"$oid":"660819f28290d35c1a0204d6"},"name":"category","type":"String","entity":"product","__v":0}
+{"_id":{"$oid":"660d872a106c7083214680de"},"name":"Supplier","type":"String","entity":"prodict","__v":0}
+{"_id":{"$oid":"660d87bf106c7083214680f7"},"name":"supplier","type":"String","entity":"product","__v":0}
