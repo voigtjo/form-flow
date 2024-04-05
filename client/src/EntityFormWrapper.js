@@ -60,11 +60,13 @@ const EntityFormWrapper = () => {
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Box mt={4} mb={4}>
-          {/* Back button */}
           <Button variant="outlined" color="primary" onClick={handleBack}>Back</Button>
           <EntityForm
             id={entityId}
-            components={uiElements.filter(element => element.entity === entity)}
+            components={uiElements.filter(element => element.entity === entity).map(element => ({
+              ...element,
+              columnWidth: 4 // Pass the column width parameter here
+            }))}
             onInputChange={handleInputChange}
             onSubmit={handleSubmit}
             onClear={handleClear}

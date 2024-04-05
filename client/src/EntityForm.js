@@ -1,4 +1,5 @@
 // EntityForm.js
+
 import React from 'react';
 import { Grid, TextField, Button, Typography } from '@mui/material';
 
@@ -18,7 +19,7 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
           <Typography variant="h6">{isNewRecord ? 'New ' + name : 'Update ' + name}</Typography>
         </Grid>
         {components && components.map((component, index) => (
-          <Grid key={index} item xs={12}>
+          <Grid key={index} item xs={component.columnWidth || 12}> {/* Utilizing columnWidth */}
             <TextField
               fullWidth
               variant="outlined"
