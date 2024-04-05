@@ -1,0 +1,835 @@
+The backend of the application is a Mongodb. The application is designed to be a no-code application. There are two collections, attributes and uielements, that are part of the no-code platform. For each collection which is called "entity" at the client and which still have to be setup manually, there are the entity (or collection) attributes defined in the attributes collection. As part of the eventually dynamically to be created application there are currently three collections "user", "product" and "records". For the two collections attributes and uielements, that are part of the no-code platform and for the three collections "user", "product" and "records" that are part of the dynamic application, the attributes of the collections, that are used to dynamicall create the mongoose schema, are stored in the attributes collection. Here are the current data:
+{"_id":{"$oid":"66031ece905c19cf14b05fe5"},"name":"firstName","type":"String","entity":"user"}
+{"_id":{"$oid":"66031eeb905c19cf14b0dd19"},"name":"lastName","type":"String","entity":"user"}
+{"_id":{"$oid":"66031eff905c19cf14b139b7"},"name":"age","type":"Number","entity":"user"}
+{"_id":{"$oid":"66031f15905c19cf14b19a4e"},"name":"email","type":"String","entity":"user"}
+{"_id":{"$oid":"66031f2e905c19cf14b2762e"},"name":"address","type":"String","entity":"user"}
+{"_id":{"$oid":"66031f44905c19cf14b2d526"},"name":"name","type":"String","entity":"product"}
+{"_id":{"$oid":"66031f58905c19cf14b32ba1"},"name":"price","type":"Number","entity":"product"}
+{"_id":{"$oid":"66031f6b905c19cf14b378b9"},"name":"description","type":"String","entity":"product"}
+{"_id":{"$oid":"6606f7c942a1ca5ae542d8f2"},"name":"name","type":"String","entity":"attribute"}
+{"_id":{"$oid":"6606f88d42a1ca5ae542d8f3"},"name":"type","type":"String","entity":"attribute"}
+{"_id":{"$oid":"6606f8c642a1ca5ae542d8f4"},"name":"entity","type":"String","entity":"attribute"}
+{"_id":{"$oid":"6606fde542a1ca5ae542d8f8"},"name":"name","type":"String","entity":"record"}
+{"_id":{"$oid":"6606fe3242a1ca5ae542d8fa"},"name":"position","type":"String","entity":"record"}
+{"_id":{"$oid":"6606fe5542a1ca5ae542d8fb"},"name":"level","type":"String","entity":"record"}
+{"_id":{"$oid":"6607d6db5d7787bd3fab1263"},"name":"label","type":"String","entity":"uielement"}
+{"_id":{"$oid":"6607d6f05d7787bd3fab1265"},"name":"entity","type":"String","entity":"uielement"}
+{"_id":{"$oid":"6607d7005d7787bd3fab1267"},"name":"type","type":"String","entity":"uielement"}
+{"_id":{"$oid":"6607d7135d7787bd3fab1269"},"name":"entityid","type":"String","entity":"uielement"}
+{"_id":{"$oid":"660819f28290d35c1a0204d6"},"name":"category","type":"String","entity":"product"}
+{"_id":{"$oid":"660d87bf106c7083214680f7"},"name":"supplier","type":"String","entity":"product"}
+For every attribute exists an uielement, that is defined in the uilelement collection. Here are the current uielements:
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd6"},"label":"Price","type":"number","entity":"product","entityid":"price"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd7"},"label":"Name","type":"String","entity":"attribute","entityid":"name"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd8"},"label":"Type","type":"String","entity":"attribute","entityid":"type"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd9"},"label":"Last Name","entity":"user","type":"String","entityid":"lastName"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bda"},"label":"Name","type":"String","entity":"record","entityid":"name"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdb"},"label":"Entity","type":"String","entity":"attribute","entityid":"entity"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdc"},"label":"Position","type":"String","entity":"record","entityid":"position"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdd"},"label":"Level","type":"String","entity":"record","entityid":"level"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bde"},"label":"Description","entity":"product","type":"String","entityid":"description"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdf"},"label":"First Name","entity":"user","type":"String","entityid":"firstName"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1be0"},"label":"Product Name","entity":"product","type":"String","entityid":"name"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1be1"},"label":"Address","entity":"user","type":"String","entityid":"address"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1be2"},"label":"Age","type":"number","entity":"user","entityid":"age"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1be3"},"label":"Email","type":"email","entity":"user","entityid":"email"}
+{"_id":{"$oid":"6607d7811aa57a7355fa55d0"},"label":"Label","type":"String","entity":"uielement","entityid":"label"}
+{"_id":{"$oid":"6607d7be1aa57a7355fa55d1"},"label":"Type","type":"String","entity":"uielement","entityid":"type"}
+{"_id":{"$oid":"6607d8111aa57a7355fa55d2"},"label":"Entity","type":"String","entity":"uielement","entityid":"entity"}
+{"_id":{"$oid":"6607d84b1aa57a7355fa55d3"},"label":"EntityId","type":"String","entity":"uielement","entityid":"entityid"}
+{"_id":{"$oid":"66081a0d8290d35c1a0204da"},"label":"Category","entity":"product","type":"String","entityid":"category"}
+{"_id":{"$oid":"660d87e0106c708321468104"},"label":"Supplier","entity":"product","type":"String","entityid":"supplier"}
+
+The server-project is in the sub-folder server:
+And in this there is a folder models with the fixed schemas of attribute and uielement, defined in the files Attribute.js:
+const mongoose = require('mongoose');
+
+// Define a schema for attribute definitions
+const AttributeSchema = new mongoose.Schema({
+  name: String,
+  type: String,
+  entity: String
+});
+
+// Define a model for attribute definitions
+const Attribute = mongoose.model('Attribute', AttributeSchema);
+
+module.exports = Attribute;
+
+and UIElement.js:
+const mongoose = require('mongoose');
+
+const UIElementSchema = new mongoose.Schema({
+  label: {
+    type: String,
+    required: true
+  },
+  props: {
+    type: Object,
+    required: true
+  },
+  entity: {
+    type: String,
+    required: true
+  }
+});
+
+const UIElement = mongoose.model('UIElement', UIElementSchema);
+
+module.exports = UIElement;
+
+The entire server is otherwise implemented in the server.js file:
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const Attribute = require('./models/Attribute'); // Import the Attribute model
+const UIElement = require('./models/UIElement'); // Import the UIElement model
+
+const app = express();
+const PORT = process.env.PORT || 5050;
+
+app.use(cors());
+app.use(bodyParser.json());
+
+const URI = process.env.ATLAS_URI || "";
+console.log("URI:" + URI);
+
+mongoose.connect(URI, {
+  dbName: 'employees',
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('Failed to connect to MongoDB', err));
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+// Function to capitalize the first letter of a string
+String.prototype.capitalize = function() {
+  return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
+// Fetch attributes from MongoDB
+async function fetchAttributes() {
+  try {
+    const attributes = await Attribute.find();
+    return attributes;
+  } catch (error) {
+    console.error('Error fetching attributes:', error);
+    throw error;
+  }
+}
+
+// Initialize schemas dynamically based on attributes fetched from MongoDB
+async function initializeSchemas() {
+  try {
+    const fetchedAttributes = await fetchAttributes();
+    const schemas = {};
+
+    // Iterate over fetched attributes to define schemas
+    for (const attribute of fetchedAttributes) {
+      const { entity, name, type } = attribute;
+      if (!schemas[entity]) {
+        schemas[entity] = {};
+      }
+      if (!mongoose.models[name.capitalize()]) { // Check if model already exists
+        schemas[entity][name] = mongoose.Schema.Types[type];
+      }
+    }
+
+    // Define mongoose models based on schemas
+    for (const entityName in schemas) {
+      const capitalizedEntityName = entityName.capitalize();
+      if (!mongoose.models[capitalizedEntityName]) { // Check if model already exists
+        mongoose.model(capitalizedEntityName, new mongoose.Schema(schemas[entityName]));
+      }
+    }
+
+    return schemas;
+  } catch (error) {
+    console.error('Error initializing schemas:', error);
+    throw error;
+  }
+}
+
+// Initialize schemas on server start
+let schemas;
+initializeSchemas()
+  .then((initializedSchemas) => {
+    schemas = initializedSchemas;
+  })
+  .catch((error) => {
+    console.error('Failed to initialize schemas:', error);
+    process.exit(1);
+  });
+
+// Fetch UI elements from MongoDB
+async function fetchUIElements() {
+  try {
+    const uiElements = await UIElement.find();
+    return uiElements;
+  } catch (error) {
+    console.error('Error fetching UI elements:', error);
+    throw error;
+  }
+}
+
+// Route for fetching UI elements
+app.get('/ui-elements', async (req, res) => {
+  try {
+    const uiElements = await fetchUIElements();
+    res.json(uiElements);
+    console.log('Fetched UI elements:', uiElements);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+// Generic route for fetching entities
+app.get('/:entity', async (req, res) => {
+  const { entity } = req.params;
+  try {
+    if (!schemas || !schemas[entity]) {
+      return res.status(404).json({ message: `Schema for ${entity} not found` });
+    }
+    
+    const EntityModel = mongoose.models[entity.capitalize()] || mongoose.model(entity.capitalize(), new mongoose.Schema(schemas[entity]));
+    const entities = await EntityModel.find();
+    const entitiesWithIdToString = entities.map(ent => ({
+      ...ent.toObject(),
+      id: ent._id.toString()
+    }));
+    res.json(entitiesWithIdToString);
+    console.log(`Fetched ${entity}s:`, entitiesWithIdToString);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Route for finding a dataset by ID
+app.get('/:entity/:id', async (req, res) => {
+  const { entity, id } = req.params;
+  try {
+    if (!schemas || !schemas[entity]) {
+      return res.status(404).json({ message: `Schema for ${entity} not found` });
+    }
+    
+    const EntityModel = mongoose.models[entity.capitalize()] || mongoose.model(entity.capitalize(), new mongoose.Schema(schemas[entity]));
+    const dataset = await EntityModel.findById(id);
+    if (!dataset) return res.status(404).json({ message: `${entity.capitalize()} not found` });
+    
+    res.json(dataset);
+    console.log(`Found ${entity} by ID ${id}:`, dataset);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Generic route for creating entities
+app.post('/:entity', async (req, res) => {
+  const { entity } = req.params;
+  try {
+    const EntityModel = mongoose.models[entity.capitalize()] || mongoose.model(entity.capitalize(), new mongoose.Schema(schemas[entity]));
+    const newEntity = new EntityModel(req.body);
+    await newEntity.save();
+    res.status(201).json(newEntity);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Generic route for updating entities
+app.put('/:entity/:id', async (req, res) => {
+  const { entity, id } = req.params;
+  try {
+    const EntityModel = mongoose.models[entity.capitalize()] || mongoose.model(entity.capitalize(), new mongoose.Schema(schemas[entity]));
+    const updatedEntity = await EntityModel.findByIdAndUpdate(id, req.body, { new: true });
+    if (!updatedEntity) return res.status(404).json({ message: `${entity.capitalize()} not found` });
+    res.json(updatedEntity);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Generic route for deleting entities
+app.delete('/:entity/:id', async (req, res) => {
+  const { entity, id } = req.params;
+  try {
+    const EntityModel = mongoose.models[entity.capitalize()] || mongoose.model(entity.capitalize(), new mongoose.Schema(schemas[entity]));
+    const deletedEntity = await EntityModel.findByIdAndDelete(id);
+    if (!deletedEntity) return res.status(404).json({ message: `${entity.capitalize()} not found` });
+    res.json({ message: `${entity.capitalize()} deleted successfully` });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+server.js contains dynamically route for the CRUD operations on the collections. The dynamic rout starts with '/:entity'
+
+The client is implemented in the clien subfolder. App.js is the starter file:
+import React from 'react';
+import { Container, Typography } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import MainPage from './MainPage';
+import EntityFormWrapper from './EntityFormWrapper';
+
+const App = () => {
+  return (
+    <Container>
+      <Typography variant="h3" align="center">Form Flow</Typography>
+      <Router>
+        <Routes>
+          {/* Route for EntityFormWrapper */}
+          <Route path="/:entity/:entityId" element={<EntityFormWrapper />} />
+
+          {/* Route for the main page */}
+          <Route path="/" element={<MainPage />} />
+        </Routes>
+      </Router>
+    </Container>
+  );
+};
+
+export default App;
+
+There are two routes: 
+One to the MainPage with the navigation between the different collections and the tables for the selected collections (that are called activeTab, because it is the selected active tab) on the right site of the page:
+import React, { useState, useEffect } from 'react';
+import {Typography, Grid, Button, TableContainer, Paper, Box } from '@mui/material'; // Import TextField
+
+import EntityTable from './EntityTable';
+import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation hook
+import queryString from 'query-string'; // Import queryString library
+import { postData, updateData } from './api'; // Import API functions
+import * as functions from './functions'; // Import functions
+import { IconButton } from '@mui/material'; // Import IconButton from Material-UI
+import MenuIcon from '@mui/icons-material/Menu'; // Import MenuIcon from Material-UI
+
+const MainPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation(); // Get location object
+  const queryParams = queryString.parse(location.search); // Parse query parameters
+  const [entityData, setEntityData] = useState({});
+  const [entities, setEntities] = useState([]);
+  const [selectedEntityIndex, setSelectedEntityIndex] = useState(null);
+  const [uiElements, setUiElements] = useState([]);
+  const [activeTab, setActiveTab] = useState(queryParams.activeTab || 'user'); // Set active tab from query parameter, default to 'user'
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(true); // State to track sidebar visibility
+
+
+  useEffect(() => {
+    functions.fetchDataForTab(activeTab, setEntities);
+  }, [activeTab]);
+
+  useEffect(() => {
+    functions.fetchUiElements(activeTab, setUiElements, initializeEntityData, setSearchTerm);
+    setSearchTerm('');
+  }, [activeTab]);
+
+  useEffect(() => {
+    // Update URL query parameter when activeTab changes
+    const query = queryString.stringify({ activeTab });
+    navigate(`/?${query}`);
+  }, [activeTab, navigate]);
+
+    // Function to toggle sidebar visibility
+    const toggleSidebar = () => {
+      setSidebarOpen(!sidebarOpen);
+    };
+
+  const initializeEntityData = (data) => {
+    functions.initializeEntityData(data, setEntityData);
+  };
+
+  const handleInputChange = (value, key) => {
+    functions.handleInputChange(value, key, entityData, setEntityData);
+  };
+
+  const handleSubmit = (e) => {
+    functions.handleSubmit(e, entityData.id === null, activeTab, entityData, entities, setEntities, selectedEntityIndex, setSelectedEntityIndex, uiElements, setEntityData, postData, updateData, setSearchTerm);
+  };
+
+  const handleEdit = (index) => {
+    functions.handleEdit(index, activeTab, entities, setEntityData, setSelectedEntityIndex);
+  };
+
+  const handleClear = () => {
+    functions.handleClear(activeTab, uiElements, setEntityData);
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
+  const handleSearch = (event) => {
+    functions.handleSearch(event, setSearchTerm);
+  };
+
+  const filteredEntities = entities.filter(entity => {
+    return Object.values(entity).some(value =>
+      value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
+  const handleNewEntity = async () => {
+    try {
+      const newEntity = await functions.handleNewEntity(activeTab, uiElements, postData);
+      console.log("handleNewEntity: newEntity.id=" + newEntity.id + ", newEntity._id=" + newEntity._id);
+      console.log(newEntity);
+      navigate(`/${activeTab}/${newEntity._id}`);
+    } catch (error) {
+      console.error('Error creating new entity:', error);
+    }
+  };
+
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={3} style={{ display: sidebarOpen ? 'block' : 'none' }}> {/* Conditional rendering of sidebar */}
+        <div>
+          <Typography variant="h5" style={{ marginTop: '16px' }}>Admin Panel</Typography>
+          {Array.from(new Set(uiElements.map(element => element.entity)))
+            .filter(tab => tab === 'attribute' || tab === 'uielement')
+            .map((tab, index) => {
+              return (
+                <Button
+                  key={index}
+                  onClick={() => handleTabChange(tab)}
+                  variant={activeTab === tab ? 'contained' : 'outlined'}
+                  color="primary"
+                  fullWidth
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
+                </Button>
+              );
+            })}
+        </div>
+        <div>
+          <Typography variant="h5" style={{ marginTop: '16px' }}>User Panel</Typography>
+          {Array.from(new Set(uiElements.map(element => element.entity)))
+            .filter(tab => tab !== 'attribute' && tab !== 'uielement')
+            .map((tab, index) => {
+              return (
+                <Button
+                  key={index}
+                  onClick={() => handleTabChange(tab)}
+                  variant={activeTab === tab ? 'contained' : 'outlined'}
+                  color="primary"
+                  fullWidth
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
+                </Button>
+              );
+            })}
+        </div>
+      </Grid>
+      <Grid item xs={9}>
+        <Box mt={4} mb={4} display="flex" justifyContent="space-between">
+          <Box>
+            {/* Toggle sidebar button */}
+            <IconButton onClick={toggleSidebar} color="primary" aria-label="toggle-sidebar">
+              <MenuIcon />
+            </IconButton>
+          </Box>
+          <Box>
+            {/* New entity button */}
+            <Button
+              onClick={handleNewEntity}
+              variant="outlined"
+              color="primary"
+            >
+              New {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Entry
+            </Button>
+          </Box>
+        </Box>
+
+        {/* Entity table */}
+        {uiElements.filter(element => element.entity === activeTab).length > 0 && (
+          <TableContainer component={Paper}>
+            <EntityTable
+              entities={filteredEntities}
+              onEdit={handleEdit}
+              tableColumns={uiElements.filter(element => element.entity === activeTab)}
+              activeTab={activeTab}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              onTabChange={handleTabChange}
+            />
+          </TableContainer>
+        )}
+      </Grid>
+    </Grid>
+  );
+};
+
+export default MainPage;
+
+And one to the EntityFormWrapper 
+import React, { useState, useEffect } from 'react';
+import { Grid, Box, Button } from '@mui/material';
+import { useParams, useNavigate } from 'react-router-dom';
+import EntityForm from './EntityForm';
+import { postData, updateData, fetchEntityById } from './api'; // Import API functions
+import * as functions from './functions'; // Import functions
+
+const EntityFormWrapper = () => {
+  const { entity, entityId } = useParams();
+  const [uiElements, setUiElements] = useState([]);
+  const [entityData, setEntityData] = useState({});
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch data for entity and initialize UI elements
+    functions.fetchUiElements(entity, setUiElements, data => {
+      // Filter uiElements based on the current entity
+      return data.filter(element => element.entity === entity);
+    });
+    fetchEntityData(entity, entityId);
+  }, [entity, entityId]);
+
+  const fetchEntityData = async (entity, entityId) => {
+    try {
+      const data = await fetchEntityById(entity, entityId);
+      setEntityData(data);
+    } catch (error) {
+      console.error(`Error fetching ${entity} by ID ${entityId}:`, error);
+    }
+  };
+
+  const handleInputChange = (value, key) => {
+    functions.handleInputChange(value, key, entityData, setEntityData);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const endpoint = entityId === null ? entity : `${entity}/${entityId}`;
+  
+    try {
+      const updatedData = await updateData(endpoint, entityData);
+      setEntityData(updatedData);
+    } catch (error) {
+      console.error(`Error updating ${entity} data:`, error);
+    }
+  };
+
+  const handleClear = () => {
+    functions.handleClear(entity, uiElements, setEntityData);
+  };
+
+  const handleBack = () => {
+    // Navigate back to the MainPage with the same activeTab selected
+    navigate(`/?activeTab=${entity}`);
+  };
+  
+
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <Box mt={4} mb={4}>
+          <Button variant="outlined" color="primary" onClick={handleBack}>Back</Button>
+          <EntityForm
+            id={entityId}
+            components={uiElements.filter(element => element.entity === entity).map(element => ({
+              ...element,
+              columnWidth: 4 // Pass the column width parameter here
+            }))}
+            onInputChange={handleInputChange}
+            onSubmit={handleSubmit}
+            onClear={handleClear}
+            data={entityData}
+            name={entity}
+          />
+        </Box>
+      </Grid>
+    </Grid>
+  );
+};
+
+export default EntityFormWrapper;
+
+which is a wrapper around the dynamic EntityForm:
+// EntityForm.js
+
+import React from 'react';
+import { Grid, TextField, Button, Typography } from '@mui/material';
+
+const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, name }) => {
+  console.log('Received data in EntityForm:', data); // Debugging statement
+
+  const isNewRecord = !id;
+
+  const handleClear = () => {
+    onClear();
+  };
+
+  return (
+    <form onSubmit={onSubmit}>
+      <Grid container spacing={2} style={{ marginTop: '32px' }}>
+        <Grid item xs={12}>
+          <Typography variant="h6">{isNewRecord ? 'New ' + name : 'Update ' + name}</Typography>
+        </Grid>
+        {components && components.map((component, index) => (
+          <Grid key={index} item xs={component.columnWidth || 12}> {/* Utilizing columnWidth */}
+            <TextField
+              fullWidth
+              variant="outlined"
+              label={component.label}
+              onChange={(e) => onInputChange(e.target.value, component.entityid)}
+              value={data ? data[component.entityid] || '' : ''}
+            />
+          </Grid>
+        ))}
+        <input type="hidden" name="id" value={id || ''} />
+        <Grid item xs={12}>
+          <Button type="submit" variant="contained" color="primary">Submit</Button>
+          <Button type="button" variant="contained" color="secondary" onClick={handleClear}>Clear</Button>
+        </Grid>
+      </Grid>
+    </form>
+  );
+};
+
+export default EntityForm;
+
+There are two plain javascript files on the clien side: api.js and functions.js:
+api.js should be the file interacting with the server.js on the server sid.
+function.js should call the api-functions in api.js and implement all functions that are needed and called eiter in MainPage.js oder EntityForm.js oder EntityFormWrappe.js. This part of the project is not yet fully organized as it should.
+api.js:
+// api.js
+
+const BASE_URL = 'http://localhost:5050'; // Replace this with your actual API base URL
+
+export const fetchUiElements = async (entity) => {
+  try {
+    const response = await fetch(`${BASE_URL}/ui-elements/${entity}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(`Error fetching UI elements for ${entity}:`, error);
+    throw error;
+  }
+};
+
+export const fetchData = async (tab) => {
+  const url = tab === 'user' ? 'http://localhost:5050/user' : `http://localhost:5050/${tab}`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error fetching ${tab} data: ${error.message}`);
+  }
+};
+
+export const fetchEntityById = async (entity, id) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${entity}/${id}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(`Error fetching ${entity} by ID ${id}:`, error);
+    throw error;
+  }
+};
+
+export const postData = async (endpoint, body) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    const responseData = await response.json();
+    console.log("postData: endpoint= " + responseData);
+    console.log(responseData);
+    return responseData;
+  } catch (error) {
+    console.error('Error posting data:', error);
+    throw error;
+  }
+};
+
+// Update the updateData function
+export const updateData = async (endpoint, body) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${endpoint}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    const updatedData = await response.json();
+    return updatedData;
+  } catch (error) {
+    console.error(`Error updating data at ${endpoint}:`, error);
+    throw error;
+  }
+};
+
+export const deleteData = async (entity, id) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${entity}/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to delete ${entity} with ID ${id}`);
+    }
+    console.log(`${entity} with ID ${id} deleted successfully`);
+  } catch (error) {
+    console.error(`Error deleting ${entity} with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+// Add other API functions as needed
+
+functions.js
+import { fetchData, postData, updateData, deleteData } from './api'; // Import API functions
+import { fetchEntityById as fetchEntityByIdFromApi } from './api'; // Import the correct function
+
+export const fetchDataForTab = async (activeTab, setEntities) => {
+  try {
+    const data = await fetchData(activeTab);
+    setEntities(data);
+    console.log(`Data received for ${activeTab}:`, data);
+  } catch (error) {
+    console.error(`Error fetching ${activeTab}:`, error);
+  }
+};
+
+export const fetchUiElements = async (activeTab, setUiElements, initializeEntityData, setSearchTerm) => {
+  try {
+    const data = await fetchData('ui-elements');
+    console.log("fetchUiElements: data=");
+    console.log(data);
+    setUiElements(data);
+    initializeEntityData(data.filter(element => element.entity === activeTab));
+  } catch (error) {
+    console.error(`Error fetching UI elements:`, error);
+  }
+};
+
+export const fetchEntityById = async (entity, id, setEntityData) => {
+  try {
+    const data = await fetchEntityByIdFromApi(entity, id); // Use the correct function
+    setEntityData(data);
+  } catch (error) {
+    console.error(`Error fetching ${entity} by ID ${id}:`, error);
+  }
+};
+
+
+export const initializeEntityData = (data, setEntityData) => {
+  const initialEntityData = data.reduce((acc, curr) => {
+    acc[curr.entityid] = '';
+    return acc;
+  }, { id: null });
+  setEntityData(initialEntityData);
+};
+
+export const handleInputChange = (value, key, entityData, setEntityData) => {
+  setEntityData({ ...entityData, [key]: value });
+};
+
+export const handleSubmit = async (e, isNewEntity, activeTab, entityData, entities, setEntities, selectedEntityIndex, setSelectedEntityIndex, uiElements, setEntityData, postData, updateData, setSearchTerm) => {
+  e.preventDefault();
+
+  const endpoint = isNewEntity ? activeTab : `${activeTab}/${entityData.id}`;
+  const apiFunction = isNewEntity ? postData : updateData;
+
+  try {
+    const data = await apiFunction(endpoint, entityData);
+    if (isNewEntity) {
+      setEntities([...entities, data]);
+    } else {
+      const updatedEntities = [...entities];
+      updatedEntities[selectedEntityIndex] = data;
+      setEntities(updatedEntities);
+      setSelectedEntityIndex(null);
+    }
+    const filteredElements = uiElements.filter(element => element.entity === activeTab);
+    if (filteredElements.length > 0) {
+      const initialEntityData = filteredElements.reduce((acc, curr) => {
+        acc[curr.entityid] = '';
+        return acc;
+      }, { id: null });
+      setEntityData(initialEntityData);
+    }
+  } catch (error) {
+    console.error(`Error saving ${activeTab}:`, error);
+  }
+};
+
+export const handleEdit = async (index, entity, entities, setEntityData, setSelectedEntityIndex) => {
+  try {
+    setEntityData(entities[index]);
+    setSelectedEntityIndex(index);
+  } catch (error) {
+    console.error(`Error handling edit:`, error);
+  }
+};
+
+export const handleNewEntity = async (activeTab, uiElements, postData) => {
+  try {
+    // Create an empty entity object with id set to null
+    const emptyEntity = { id: null };
+
+    // Filter UI elements for the active tab
+    const filteredUiElements = uiElements.filter(element => element.entity === activeTab);
+
+    // Initialize empty entity with properties from UI elements
+    filteredUiElements.forEach(element => {
+      emptyEntity[element.entityid] = '';
+    });
+
+    // Submit postData with the empty entity
+    const newEntity = await postData(activeTab, emptyEntity);
+    
+    return newEntity;
+  } catch (error) {
+    console.error('Error creating new entity:', error);
+    throw error;
+  }
+};
+
+
+
+
+
+export const handleClear = (activeTab, uiElements, setEntityData) => {
+  const filteredElements = uiElements.filter(element => element.entity === activeTab);
+  if (filteredElements.length > 0) {
+    const initialEntityData = filteredElements.reduce((acc, curr) => {
+      acc[curr.entityid] = '';
+      return acc;
+    }, { id: null });
+    setEntityData(initialEntityData);
+  }
+};
+
+export const handleSearch = (event, setSearchTerm) => {
+  const { value } = event.target;
+  setSearchTerm(value);
+};
+
+Now you know everything about the current status of the applications.
+Next I would like to continue to build out the no-code application.
+1) A function is needed to dynamically create a new collection
+2) A function is needed to get all names of the collections as entities
+3) The maintenance of the attributes should be enhanced so that the entity is assigned via a dropdown box from the names of the collections
+4) Than as a new functionallity a layout should be assigned to a collection. Therefore a collection layout is needed. One attribute should be the columnWidth, which is currently configured in EntityFormWrapper. Another attribute should be rowLength. Each uielement should
+5) The maintenance of the uielements should be enhanced so that the uilements are assigned to an entity dynmically via a dropdown of the collection names and additionally to a layout and this dynmically via a dropdown box from the ids of the layouts and the entityid is assigned by the user via a dropdown box from the ids of the selected collection. Each uielement should have a row and column attribute as number assigning a row-column Gridelement of the form. The Form should take the layout and assign the uielment to the layout.
+The rest of the functionality of the application should remain for now as it is.

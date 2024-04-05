@@ -8,6 +8,7 @@ import { postData, updateData } from './api'; // Import API functions
 import * as functions from './functions'; // Import functions
 import { IconButton } from '@mui/material'; // Import IconButton from Material-UI
 import MenuIcon from '@mui/icons-material/Menu'; // Import MenuIcon from Material-UI
+import { listCollections, reinitializeSchemas } from './api'; // Add reinitializeSchemas to your imports
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const MainPage = () => {
   const [activeTab, setActiveTab] = useState(queryParams.activeTab || 'user'); // Set active tab from query parameter, default to 'user'
   const [searchTerm, setSearchTerm] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true); // State to track sidebar visibility
+  const [collections, setCollections] = useState([]);
 
 
   useEffect(() => {
@@ -41,6 +43,10 @@ const MainPage = () => {
     const toggleSidebar = () => {
       setSidebarOpen(!sidebarOpen);
     };
+    useEffect(() => {
+      listCollections().then(setCollections).catch(console.error);
+    }, []);
+    
 
   const initializeEntityData = (data) => {
     functions.initializeEntityData(data, setEntityData);
@@ -87,11 +93,29 @@ const MainPage = () => {
     }
   };
 
+  const navigateToCreateCollection = () => {
+    navigate("/create-collection-form");
+  };
+
+  const handleReinitializeClick = async () => {
+    try {
+      await reinitializeSchemas();
+      alert('Schemas reinitialized successfully.'); // Provide user feedback. Consider using a more user-friendly notification system.
+    } catch (error) {
+      console.error("Failed to reinitialize schemas:", error);
+      alert('Failed to reinitialize schemas.'); // Provide user feedback
+    }
+  };
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={3} style={{ display: sidebarOpen ? 'block' : 'none' }}> {/* Conditional rendering of sidebar */}
         <div>
           <Typography variant="h5" style={{ marginTop: '16px' }}>Admin Panel</Typography>
+          <Button onClick={navigateToCreateCollection} variant="outlined" color="primary">
+            Create New Collection
+          </Button>
+
           {Array.from(new Set(uiElements.map(element => element.entity)))
             .filter(tab => tab === 'attribute' || tab === 'uielement')
             .map((tab, index) => {
@@ -108,6 +132,9 @@ const MainPage = () => {
               );
             })}
         </div>
+        <Button onClick={handleReinitializeClick} variant="contained" color="secondary" fullWidth>
+              Reinitialize Schemas
+        </Button>
         <div>
           <Typography variant="h5" style={{ marginTop: '16px' }}>User Panel</Typography>
           {Array.from(new Set(uiElements.map(element => element.entity)))
@@ -126,6 +153,7 @@ const MainPage = () => {
               );
             })}
         </div>
+
       </Grid>
       <Grid item xs={9}>
         <Box mt={4} mb={4} display="flex" justifyContent="space-between">

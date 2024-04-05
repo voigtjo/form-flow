@@ -16,5 +16,5 @@
 {"_id":{"$oid":"6607d7be1aa57a7355fa55d1"},"label":"Type","type":"String","entity":"uielement","entityid":"type"}
 {"_id":{"$oid":"6607d8111aa57a7355fa55d2"},"label":"Entity","type":"String","entity":"uielement","entityid":"entity"}
 {"_id":{"$oid":"6607d84b1aa57a7355fa55d3"},"label":"EntityId","type":"String","entity":"uielement","entityid":"entityid"}
-{"_id":{"$oid":"66081a0d8290d35c1a0204da"},"label":"Category","entity":"product","type":"String","entityid":"category","__v":0}
-{"_id":{"$oid":"660d87e0106c708321468104"},"label":"Supplier","entity":"product","type":"String","entityid":"supplier","__v":0}
+{"_id":{"$oid":"66081a0d8290d35c1a0204da"},"label":"Category","entity":"product","type":"String","entityid":"category"}
+{"_id":{"$oid":"660d87e0106c708321468104"},"label":"Supplier","entity":"product","type":"String","entityid":"supplier"}

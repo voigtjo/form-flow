@@ -84,6 +84,19 @@ initializeSchemas()
     process.exit(1);
   });
 
+
+// Endpoint to reinitialize schemas
+app.post('/reinitialize-schemas', async (req, res) => {
+  try {
+    const initializedSchemas = await initializeSchemas();
+    res.json({ message: 'Schemas reinitialized successfully.', schemas: initializedSchemas });
+  } catch (error) {
+    console.error('Error reinitializing schemas:', error);
+    res.status(500).json({ message: 'Failed to reinitialize schemas', error: error.message });
+  }
+});
+
+
 // Fetch UI elements from MongoDB
 async function fetchUIElements() {
   try {
@@ -95,12 +108,58 @@ async function fetchUIElements() {
   }
 }
 
+app.post('/create-collection', async (req, res) => {
+  const { collectionName } = req.body;
+  const errorFlag = false;
+
+  if (!collectionName) {
+      return res.status(400).json({ message: 'Collection name is required.' });
+  }
+
+  try {
+      const db = mongoose.connection.db;
+      const collections = await db.listCollections().toArray();
+      const collectionExists = collections.some(col => col.name === collectionName);
+
+      if (collectionExists) {
+        console.log("db.name=" + db.name + ", collectionName= " + collectionName + "ERROR: collection already exsists");
+          return res.status(400).json({ message: 'Collection already exists.' });
+      } else {
+          await db.createCollection(collectionName);
+          return res.status(200).json({ message: `Collection ${collectionName} created successfully.` });
+      }
+  } catch (error) {
+      errorFlag = false;
+      console.error('Error creating collection:', error);
+      return res.status(500).json({ message: 'Failed to create collection.', error: error.message });
+  } finally {
+    console.log("db.name=" + db.name + ", collectionName= " + collectionName + ": errorFlag= " + errorFlag);
+}
+});
+
+
+app.get('/list-collections', async (req, res) => {
+  try {
+      // Get a list of all collections in the database
+      const collections = await mongoose.connection.db.listCollections().toArray();
+      
+      // Extract the name of each collection and return it
+      const collectionNames = collections.map(collection => collection.name);
+      
+      res.json(collectionNames);
+  } catch (error) {
+      console.error('Failed to list collections:', error);
+      res.status(500).json({ message: 'Failed to list collections' });
+  }
+});
+
+
+
 // Route for fetching UI elements
 app.get('/ui-elements', async (req, res) => {
   try {
     const uiElements = await fetchUIElements();
     res.json(uiElements);
-    console.log('Fetched UI elements:', uiElements);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -122,7 +181,6 @@ app.get('/:entity', async (req, res) => {
       id: ent._id.toString()
     }));
     res.json(entitiesWithIdToString);
-    console.log(`Fetched ${entity}s:`, entitiesWithIdToString);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -141,7 +199,6 @@ app.get('/:entity/:id', async (req, res) => {
     if (!dataset) return res.status(404).json({ message: `${entity.capitalize()} not found` });
     
     res.json(dataset);
-    console.log(`Found ${entity} by ID ${id}:`, dataset);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
