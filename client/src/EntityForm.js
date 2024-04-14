@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Grid, TextField, Button, Typography } from '@mui/material';
+import DynamicComponent from './DynamicComponent'; // Ensure the correct path is set
 
 const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, name }) => {
   console.log('Received data in EntityForm:', data); // Debugging statement
@@ -20,12 +21,14 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
         </Grid>
         {components && components.map((component, index) => (
           <Grid key={index} item xs={component.columnWidth || 12}> {/* Utilizing columnWidth */}
-            <TextField
+            <DynamicComponent
+              type={component.type} // This should come from each component's definition
               fullWidth
               variant="outlined"
               label={component.label}
-              onChange={(e) => onInputChange(e.target.value, component.entityid)}
+              onChange={onInputChange}
               value={data ? data[component.entityid] || '' : ''}
+              entityid={component.entityid}
             />
           </Grid>
         ))}
