@@ -1,12 +1,8 @@
-// EntityForm.js
-
 import React from 'react';
 import { Grid, TextField, Button, Typography } from '@mui/material';
-import DynamicComponent from './DynamicComponent'; // Ensure the correct path is set
+import DynamicComponent from './DynamicComponent';
 
-const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, name }) => {
-  console.log('Received data in EntityForm:', data); // Debugging statement
-
+const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, name, collections }) => {
   const isNewRecord = !id;
 
   const handleClear = () => {
@@ -19,16 +15,17 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
         <Grid item xs={12}>
           <Typography variant="h6">{isNewRecord ? 'New ' + name : 'Update ' + name}</Typography>
         </Grid>
-        {components && components.map((component, index) => (
-          <Grid key={index} item xs={component.columnWidth || 12}> {/* Utilizing columnWidth */}
+        {components.map((component, index) => (
+          <Grid key={index} item xs={component.columnWidth || 12}>
             <DynamicComponent
-              type={component.type} // This should come from each component's definition
+              type={component.type}
               fullWidth
               variant="outlined"
               label={component.label}
               onChange={onInputChange}
               value={data ? data[component.entityid] || '' : ''}
               entityid={component.entityid}
+              options={component.type === 'entityRef' ? collections : undefined}
             />
           </Grid>
         ))}

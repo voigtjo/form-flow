@@ -1,19 +1,16 @@
 import React from 'react';
-import TextField from '@mui/material/TextField';
+import { TextField, MenuItem, Checkbox, FormControlLabel } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DesktopDatePicker } from '@mui/x-date-pickers';
-import MenuItem from '@mui/material/MenuItem';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 
 const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, entityid, options = [] }) => {
   const handleInputChange = (newValue) => {
     if (newValue instanceof Date || typeof newValue === 'string' || typeof newValue === 'number') {
       onChange(newValue, entityid);
     } else if (newValue.target.type === 'checkbox') {
-      onChange(newValue.target.checked, entityid); // For checkboxes, handle checked state
+      onChange(newValue.target.checked, entityid);
     } else {
-      onChange(newValue.target.value, entityid); // Handle event object for TextField and select
+      onChange(newValue.target.value, entityid);
     }
   };
 
@@ -24,7 +21,7 @@ const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, en
       case 'email':
         return (
           <TextField
-            type={type === 'email' ? 'email' : (type === 'number' ? 'number' : 'text')}
+            type={type}
             fullWidth={fullWidth}
             variant={variant}
             label={label}
@@ -33,14 +30,14 @@ const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, en
             autoComplete={type === 'email' ? "email" : undefined}
           />
         );
-      case 'select':
+      case 'entityRef': // Handle entity references (dropdown)
         return (
           <TextField
             select
             label={label}
             fullWidth={fullWidth}
             variant={variant}
-            value={value || ''}
+            value={value}
             onChange={handleInputChange}
           >
             {options.map((option, index) => (
@@ -53,13 +50,7 @@ const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, en
       case 'checkbox':
         return (
           <FormControlLabel
-            control={
-              <Checkbox
-                checked={value || false}
-                onChange={handleInputChange}
-                color="primary"
-              />
-            }
+            control={<Checkbox checked={value || false} onChange={handleInputChange} color="primary" />}
             label={label}
           />
         );

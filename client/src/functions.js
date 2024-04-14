@@ -5,7 +5,6 @@ export const fetchDataForTab = async (activeTab, setEntities) => {
   try {
     const data = await fetchData(activeTab);
     setEntities(data);
-    console.log(`Data received for ${activeTab}:`, data);
   } catch (error) {
     console.error(`Error fetching ${activeTab}:`, error);
   }
@@ -14,8 +13,6 @@ export const fetchDataForTab = async (activeTab, setEntities) => {
 export const fetchUiElements = async (activeTab, setUiElements, initializeEntityData, setSearchTerm) => {
   try {
     const data = await fetchData('ui-elements');
-    console.log("fetchUiElements: data=");
-    console.log(data);
     setUiElements(data);
     initializeEntityData(data.filter(element => element.entity === activeTab));
   } catch (error) {
@@ -97,7 +94,9 @@ export const handleNewEntity = async (activeTab, uiElements, postData) => {
     });
 
     // Submit postData with the empty entity
-    const newEntity = await postData(activeTab, emptyEntity);
+    // const newEntity = await postData(activeTab, emptyEntity);
+    console.log("handleNewEntity: emptyEntity:" + emptyEntity);
+    const newEntity = emptyEntity;
     
     return newEntity;
   } catch (error) {

@@ -15,6 +15,8 @@ const App = () => {
           {/* Route for EntityFormWrapper */}
           <Route path="/:entity/:entityId" element={<EntityFormWrapper />} />
           {/* Route for the main page */}
+          <Route path="/:entity/" element={<EntityFormWrapper />} />
+          {/* Route for the main page */}
           <Route path="/" element={<MainPage />} />
         </Routes>
       </Router>

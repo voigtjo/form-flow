@@ -41,6 +41,24 @@ async function fetchAttributes() {
   }
 }
 
+async function reconnectDatabase() {
+  try {
+      // Disconnect if already connected
+      await mongoose.disconnect();
+      // Reconnect to MongoDB
+      await mongoose.connect(URI, {
+          dbName: 'employees',
+          useNewUrlParser: true,
+          useUnifiedTopology: true
+      });
+      console.log('Reconnected to MongoDB successfully');
+  } catch (error) {
+      console.error('Failed to reconnect to MongoDB:', error);
+      throw error;  // Rethrowing the error to handle it in the calling function
+  }
+}
+
+
 // Initialize schemas dynamically based on attributes fetched from MongoDB
 async function initializeSchemas() {
   try {
@@ -86,10 +104,12 @@ initializeSchemas()
 
 
 // Endpoint to reinitialize schemas
-app.post('/reinitialize-schemas', async (req, res) => {
+app.get('/reinitialize-schemas', async (req, res) => {
   try {
-    const initializedSchemas = await initializeSchemas();
-    res.json({ message: 'Schemas reinitialized successfully.', schemas: initializedSchemas });
+    await reconnectDatabase();
+    schemas = await initializeSchemas();
+    const uiElements = await UIElement.find();
+    res.json(uiElements);
   } catch (error) {
     console.error('Error reinitializing schemas:', error);
     res.status(500).json({ message: 'Failed to reinitialize schemas', error: error.message });
@@ -156,12 +176,13 @@ app.post('/create-collection', async (req, res) => {
 
 
 app.get('/list-collections', async (req, res) => {
+  const pluralize = require('pluralize');
   try {
       // Get a list of all collections in the database
       const collections = await mongoose.connection.db.listCollections().toArray();
       
-      // Extract the name of each collection and return it
-      const collectionNames = collections.map(collection => collection.name);
+      // Extract the name of each collection, convert to singular, and return it
+      const collectionNames = collections.map(collection => pluralize.singular(collection.name));
       
       res.json(collectionNames);
   } catch (error) {
@@ -169,6 +190,7 @@ app.get('/list-collections', async (req, res) => {
       res.status(500).json({ message: 'Failed to list collections' });
   }
 });
+
 
 
 

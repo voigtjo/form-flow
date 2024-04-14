@@ -6,6 +6,7 @@ export const fetchUiElements = async (entity) => {
   try {
     const response = await fetch(`${BASE_URL}/ui-elements/${entity}`);
     const data = await response.json();
+    console.log(`UI elements fetched for entity=:${entity}: `, data);
     return data;
   } catch (error) {
     console.error(`Error fetching UI elements for ${entity}:`, error);
@@ -45,7 +46,6 @@ export const createCollection = async (collectionName, attributes) => {
       },
       body: JSON.stringify({ collectionName, attributes }),
     });
-    console.log("collection created: response.ok= " + response.ok);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -70,7 +70,6 @@ export const listCollections = async () => {
     }
 
     const collectionNames = await response.json();
-    console.log("Collections in the database:", collectionNames);
     return collectionNames;
   } catch (error) {
     console.error("Error listing collections:", error);
@@ -81,11 +80,9 @@ export const listCollections = async () => {
 
 export const reinitializeSchemas = async () => {
   try {
+    console.log("reinitialize schemas...");
     const response = await fetch(`${BASE_URL}/reinitialize-schemas`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      method: 'GET'
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -103,6 +100,7 @@ export const reinitializeSchemas = async () => {
 
 
 export const postData = async (endpoint, body) => {
+  console.log("api.postData: endpoint= " + endpoint + ", body.json= " + JSON.stringify(body));
   try {
     const response = await fetch(`${BASE_URL}/${endpoint}`, {
       method: 'POST',
@@ -112,8 +110,7 @@ export const postData = async (endpoint, body) => {
       body: JSON.stringify(body),
     });
     const responseData = await response.json();
-    console.log("postData: endpoint= " + responseData);
-    console.log(responseData);
+
     return responseData;
   } catch (error) {
     console.error('Error posting data:', error);
@@ -147,7 +144,6 @@ export const deleteData = async (entity, id) => {
     if (!response.ok) {
       throw new Error(`Failed to delete ${entity} with ID ${id}`);
     }
-    console.log(`${entity} with ID ${id} deleted successfully`);
   } catch (error) {
     console.error(`Error deleting ${entity} with ID ${id}:`, error);
     throw error;

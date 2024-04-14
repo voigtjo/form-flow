@@ -3,7 +3,6 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { useNavigate } from 'react-router-dom';
 
 const EntityTable = ({ entities, tableColumns, activeTab, searchTerm, setSearchTerm }) => {
-  console.log("EntityTable: activeTab= " + activeTab)
   const [sortBy, setSortBy] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
   const navigate = useNavigate(); // Add useNavigate hook

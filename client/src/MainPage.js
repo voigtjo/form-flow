@@ -88,7 +88,7 @@ const MainPage = () => {
       const newEntity = await functions.handleNewEntity(activeTab, uiElements, postData);
       console.log("handleNewEntity: newEntity.id=" + newEntity.id + ", newEntity._id=" + newEntity._id);
       console.log(newEntity);
-      navigate(`/${activeTab}/${newEntity._id}`);
+      navigate(`/${activeTab}`);
     } catch (error) {
       console.error('Error creating new entity:', error);
     }
@@ -98,25 +98,20 @@ const MainPage = () => {
     navigate("/create-collection-form");
   };
 
-  const handleReinitializeClick = async () => {
-    try {
-      await reinitializeSchemas();
-      alert('Schemas reinitialized successfully.'); // Provide user feedback. Consider using a more user-friendly notification system.
-    } catch (error) {
+  const handleReinitializeClick = () => {
+    reinitializeSchemas().then(() => {
+      alert('Schemas reinitialized successfully');
+    }).catch((error) => {
       console.error("Failed to reinitialize schemas:", error);
-      alert('Failed to reinitialize schemas.'); // Provide user feedback
-    }
+      alert('Failed to reinitialize schemas');
+    });
   };
-
   return (
     <Grid container spacing={2}>
       <Grid item xs={3}>
         <Sidebar
           navigateToCreateCollection={() => navigate("/create-collection-form")}
-          handleReinitializeClick={() => reinitializeSchemas().then(() => alert('Schemas reinitialized successfully')).catch((error) => {
-            console.error("Failed to reinitialize schemas:", error);
-            alert('Failed to reinitialize schemas');
-          })}
+          handleReinitializeClick={handleReinitializeClick}
           handleTabChange={handleTabChange}
           uiElements={uiElements}
           activeTab={activeTab}
