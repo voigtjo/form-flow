@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {Typography, Grid, Button, TableContainer, Paper, Box } from '@mui/material'; // Import TextField
 
 import EntityTable from './EntityTable';
+import Sidebar from './Sidebar'; // Import the Sidebar component
 import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation hook
 import queryString from 'query-string'; // Import queryString library
 import { postData, updateData } from './api'; // Import API functions
@@ -109,51 +110,18 @@ const MainPage = () => {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={3} style={{ display: sidebarOpen ? 'block' : 'none' }}> {/* Conditional rendering of sidebar */}
-        <div>
-          <Typography variant="h5" style={{ marginTop: '16px' }}>Admin Panel</Typography>
-          <Button onClick={navigateToCreateCollection} variant="outlined" color="primary">
-            Create New Collection
-          </Button>
-
-          {Array.from(new Set(uiElements.map(element => element.entity)))
-            .filter(tab => tab === 'attribute' || tab === 'uielement')
-            .map((tab, index) => {
-              return (
-                <Button
-                  key={index}
-                  onClick={() => handleTabChange(tab)}
-                  variant={activeTab === tab ? 'contained' : 'outlined'}
-                  color="primary"
-                  fullWidth
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
-                </Button>
-              );
-            })}
-        </div>
-        <Button onClick={handleReinitializeClick} variant="contained" color="secondary" fullWidth>
-              Reinitialize Schemas
-        </Button>
-        <div>
-          <Typography variant="h5" style={{ marginTop: '16px' }}>User Panel</Typography>
-          {Array.from(new Set(uiElements.map(element => element.entity)))
-            .filter(tab => tab !== 'attribute' && tab !== 'uielement')
-            .map((tab, index) => {
-              return (
-                <Button
-                  key={index}
-                  onClick={() => handleTabChange(tab)}
-                  variant={activeTab === tab ? 'contained' : 'outlined'}
-                  color="primary"
-                  fullWidth
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
-                </Button>
-              );
-            })}
-        </div>
-
+      <Grid item xs={3}>
+        <Sidebar
+          navigateToCreateCollection={() => navigate("/create-collection-form")}
+          handleReinitializeClick={() => reinitializeSchemas().then(() => alert('Schemas reinitialized successfully')).catch((error) => {
+            console.error("Failed to reinitialize schemas:", error);
+            alert('Failed to reinitialize schemas');
+          })}
+          handleTabChange={handleTabChange}
+          uiElements={uiElements}
+          activeTab={activeTab}
+          sidebarOpen={sidebarOpen}
+        />
       </Grid>
       <Grid item xs={9}>
         <Box mt={4} mb={4} display="flex" justifyContent="space-between">

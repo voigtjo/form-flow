@@ -81,7 +81,7 @@ export const listCollections = async () => {
 
 export const reinitializeSchemas = async () => {
   try {
-    const response = await fetch('/reinitialize-schemas', {
+    const response = await fetch(`${BASE_URL}/reinitialize-schemas`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
