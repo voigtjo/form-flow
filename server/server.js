@@ -109,33 +109,50 @@ async function fetchUIElements() {
 }
 
 app.post('/create-collection', async (req, res) => {
-  const { collectionName } = req.body;
-  const errorFlag = false;
+  const { collectionName } = req.body; // Assume the input name is the singular form of the collection name
+  const pluralize = require('pluralize');
 
   if (!collectionName) {
       return res.status(400).json({ message: 'Collection name is required.' });
   }
 
+  const collectionRef = pluralize(collectionName); // Plural form of the collection name for MongoDB collection
+
   try {
       const db = mongoose.connection.db;
       const collections = await db.listCollections().toArray();
-      const collectionExists = collections.some(col => col.name === collectionName);
+      const collectionExists = collections.some(col => col.name === collectionRef);
 
       if (collectionExists) {
-        console.log("db.name=" + db.name + ", collectionName= " + collectionName + "ERROR: collection already exsists");
+          console.log(`db.name=${db.name}, collectionName=${collectionRef} ERROR: collection already exists`);
           return res.status(400).json({ message: 'Collection already exists.' });
       } else {
-          await db.createCollection(collectionName);
-          return res.status(200).json({ message: `Collection ${collectionName} created successfully.` });
+          await db.createCollection(collectionRef); // Use pluralized name for the actual MongoDB collection
+
+          // Ensure EntityModel is your model for the 'entities' collection
+          const EntityModel = mongoose.models['Entity'] || mongoose.model('Entity', new mongoose.Schema({
+              name: String, // Singular form
+              collection: String // Plural form used here for collection
+          }));
+
+          // Insert into entities collection
+          const newEntity = new EntityModel({
+              name: collectionName,
+              collection: collectionRef
+          });
+          await newEntity.save();
+
+          return res.status(200).json({ message: `Collection ${collectionRef} created successfully.` });
       }
   } catch (error) {
-      errorFlag = false;
       console.error('Error creating collection:', error);
       return res.status(500).json({ message: 'Failed to create collection.', error: error.message });
   } finally {
-    console.log("db.name=" + db.name + ", collectionName= " + collectionName + ": errorFlag= " + errorFlag);
-}
+      console.log(`db.name=${db.name}, collectionName=${collectionRef}: creation attempt finished`);
+  }
 });
+
+
 
 
 app.get('/list-collections', async (req, res) => {
