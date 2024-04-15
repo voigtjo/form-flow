@@ -1,20 +1,24 @@
 {"_id":{"$oid":"6607cc1528cd2dee7a5b1bd6"},"label":"Price","type":"number","entity":"product","entityid":"price"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd7"},"label":"Name","type":"String","entity":"attribute","entityid":"name"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd8"},"label":"Type","type":"String","entity":"attribute","entityid":"type"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd9"},"label":"Last Name","entity":"user","type":"String","entityid":"lastName"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1bda"},"label":"Name","type":"String","entity":"record","entityid":"name"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdb"},"label":"Entity","type":"String","entity":"attribute","entityid":"entity"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdc"},"label":"Position","type":"String","entity":"record","entityid":"position"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdd"},"label":"Level","type":"String","entity":"record","entityid":"level"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1bde"},"label":"Description","entity":"product","type":"String","entityid":"description"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdf"},"label":"First Name","entity":"user","type":"String","entityid":"firstName"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1be0"},"label":"Product Name","entity":"product","type":"String","entityid":"name"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1be1"},"label":"Address","entity":"user","type":"String","entityid":"address"}
-{"_id":{"$oid":"6607cc1528cd2dee7a5b1be2"},"label":"Age","type":"number","entity":"user","entityid":"age"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd8"},"label":"Type","type":"text","entity":"attribute","entityid":"type"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdb"},"label":"Entity","type":"entityRef","entity":"attribute","entityid":"entity"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdf"},"label":"First Name","entity":"user","type":"text","entityid":"firstName"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdc"},"label":"Position","type":"text","entity":"record","entityid":"position"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1be1"},"label":"Address","entity":"user","type":"text","entityid":"address"}
 {"_id":{"$oid":"6607cc1528cd2dee7a5b1be3"},"label":"Email","type":"email","entity":"user","entityid":"email"}
-{"_id":{"$oid":"6607d7811aa57a7355fa55d0"},"label":"Label","type":"String","entity":"uielement","entityid":"label"}
-{"_id":{"$oid":"6607d7be1aa57a7355fa55d1"},"label":"Type","type":"String","entity":"uielement","entityid":"type"}
-{"_id":{"$oid":"6607d8111aa57a7355fa55d2"},"label":"Entity","type":"String","entity":"uielement","entityid":"entity"}
-{"_id":{"$oid":"6607d84b1aa57a7355fa55d3"},"label":"EntityId","type":"String","entity":"uielement","entityid":"entityid"}
-{"_id":{"$oid":"66081a0d8290d35c1a0204da"},"label":"Category","entity":"product","type":"String","entityid":"category"}
-{"_id":{"$oid":"660d87e0106c708321468104"},"label":"Supplier","entity":"product","type":"String","entityid":"supplier"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bda"},"label":"Name","type":"text","entity":"record","entityid":"name"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd7"},"label":"Name","type":"text","entity":"attribute","entityid":"name"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bd9"},"label":"Last Name","entity":"user","type":"text","entityid":"lastName"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1be2"},"label":"Age","type":"number","entity":"user","entityid":"age"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bdd"},"label":"Level","type":"text","entity":"record","entityid":"level"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1be0"},"label":"Product Name","entity":"product","type":"text","entityid":"name"}
+{"_id":{"$oid":"6607cc1528cd2dee7a5b1bde"},"label":"Description","entity":"product","type":"text","entityid":"description"}
+{"_id":{"$oid":"6607d7811aa57a7355fa55d0"},"label":"Label","type":"text","entity":"uielement","entityid":"label"}
+{"_id":{"$oid":"6607d7be1aa57a7355fa55d1"},"label":"Type","type":"text","entity":"uielement","entityid":"type"}
+{"_id":{"$oid":"6607d8111aa57a7355fa55d2"},"label":"Entity","type":"entityRef","entity":"uielement","entityid":"entity"}
+{"_id":{"$oid":"6607d84b1aa57a7355fa55d3"},"label":"EntityId","type":"text","entity":"uielement","entityid":"entityid"}
+{"_id":{"$oid":"66081a0d8290d35c1a0204da"},"label":"Category","entity":"product","type":"text","__v":0,"entityid":"category"}
+{"_id":{"$oid":"660d87e0106c708321468104"},"label":"Supplier","entity":"product","type":"text","__v":0,"entityid":"supplier"}
+{"_id":{"$oid":"6610180102f9d4d0ce377b7f"},"label":"Company","entity":"customer","type":"text","entityid":"company","__v":0}
+{"_id":{"$oid":"661bbb143e953d0f14e50485"},"label":"Name","entity":"customer","type":"text","entityid":"name","__v":0}
+{"_id":{"$oid":"661c1399764da73670134e22"},"label":"Address","entity":"customer","type":"text","entityid":"cust_address","__v":0}
+{"_id":{"$oid":"661c1d0f21e12f7771b04993"},"label":"Test","entity":"customer","type":"text","entityid":"test","__v":0}
