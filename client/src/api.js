@@ -2,6 +2,20 @@
 
 const BASE_URL = 'http://localhost:5050'; // Replace this with your actual API base URL
 
+export const fetchAttributesByEntity = async (entity) => {
+  try {
+    const response = await fetch(`${BASE_URL}/attributes/${entity}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const attributes = await response.json();
+    return attributes;
+  } catch (error) {
+    console.error(`Error fetching attributes for ${entity}:`, error);
+    throw error;  // Re-throw to allow the calling context to handle it
+  }
+};
+
 export const fetchUiElements = async (entity) => {
   try {
     const response = await fetch(`${BASE_URL}/ui-elements/${entity}`);

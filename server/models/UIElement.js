@@ -1,21 +1,18 @@
 const mongoose = require('mongoose');
 
+// Define a schema for UI elements
 const UIElementSchema = new mongoose.Schema({
-  label: {
+  label: String,
+  type: {
     type: String,
-    required: true
+    enum: ['number', 'string', 'boolean', 'date', 'datetime-local', 'email', 'month', 'password', 'search', 'tel', 'time', 'url', 'week'],
+    default: 'string'
   },
-  props: {
-    type: Object,
-    required: true
-  },
-  entity: {
-    type: String,
-    required: true
-  }
+  entity: String,
+  entityid: String
 });
 
+// Define a model for UI elements
 const UIElement = mongoose.model('UIElement', UIElementSchema);
 
 module.exports = UIElement;
-

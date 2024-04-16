@@ -4,6 +4,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DesktopDatePicker } from '@mui/x-date-pickers';
 
 const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, entityid, options = [] }) => {
+
   const handleInputChange = (newValue) => {
     if (newValue instanceof Date || typeof newValue === 'string' || typeof newValue === 'number') {
       onChange(newValue, entityid);
@@ -47,6 +48,28 @@ const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, en
             ))}
           </TextField>
         );
+        case 'entityIdRef':
+          if (options.length === 0) {
+            return <TextField label={label} fullWidth={fullWidth} variant={variant} disabled />;
+          }
+          return (
+            <TextField
+                select
+                label={label}
+                fullWidth={fullWidth}
+                variant={variant}
+                value={value || ''}  // Ensure there's a valid fallback
+                onChange={(e) => onChange(e.target.value, entityid)}
+            >
+              {options.map((option, index) => (
+                <MenuItem key={index} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          );
+        
+        
       case 'checkbox':
         return (
           <FormControlLabel

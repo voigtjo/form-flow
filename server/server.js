@@ -192,6 +192,21 @@ app.get('/list-collections', async (req, res) => {
 });
 
 
+// Route for fetching attributes by entity
+app.get('/attributes/:entity', async (req, res) => {
+  const { entity } = req.params;
+
+  try {
+    const attributes = await Attribute.find({ entity: entity });
+    if (attributes.length === 0) {
+      return res.status(404).json({ message: `No attributes found for entity ${entity}` });
+    }
+    res.json(attributes);
+  } catch (error) {
+    console.error(`Error fetching attributes for entity ${entity}:`, error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
 
 // Route for fetching UI elements
