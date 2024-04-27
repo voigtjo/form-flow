@@ -1,28 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import {Typography, Grid, Button, TableContainer, Paper, Box } from '@mui/material'; // Import TextField
+import {Grid, Button, TableContainer, Paper, Box } from '@mui/material'; // Import TextField
 
 import EntityTable from './EntityTable';
 import Sidebar from './Sidebar'; // Import the Sidebar component
 import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation hook
 import queryString from 'query-string'; // Import queryString library
-import { postData, updateData } from './api'; // Import API functions
+import { postData } from './api'; // Import API functions
 import * as functions from './functions'; // Import functions
 import { IconButton } from '@mui/material'; // Import IconButton from Material-UI
 import MenuIcon from '@mui/icons-material/Menu'; // Import MenuIcon from Material-UI
-import { listCollections, reinitializeSchemas } from './api'; // Add reinitializeSchemas to your imports
+import {reinitializeSchemas } from './api'; // Add reinitializeSchemas to your imports
 
 const MainPage = () => {
   const navigate = useNavigate();
   const location = useLocation(); // Get location object
   const queryParams = queryString.parse(location.search); // Parse query parameters
-  const [entityData, setEntityData] = useState({});
   const [entities, setEntities] = useState([]);
-  const [selectedEntityIndex, setSelectedEntityIndex] = useState(null);
   const [uiElements, setUiElements] = useState([]);
   const [activeTab, setActiveTab] = useState(queryParams.activeTab || 'user'); // Set active tab from query parameter, default to 'user'
   const [searchTerm, setSearchTerm] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true); // State to track sidebar visibility
-  const [collections, setCollections] = useState([]);
+
 
 
   useEffect(() => {
@@ -30,7 +28,7 @@ const MainPage = () => {
   }, [activeTab]);
 
   useEffect(() => {
-    functions.fetchUiElements(activeTab, setUiElements, initializeEntityData, setSearchTerm);
+    functions.fetchUiElements(activeTab, setUiElements, setSearchTerm);
     setSearchTerm('');
   }, [activeTab]);
 
@@ -44,38 +42,18 @@ const MainPage = () => {
     const toggleSidebar = () => {
       setSidebarOpen(!sidebarOpen);
     };
-    useEffect(() => {
-      listCollections().then(setCollections).catch(console.error);
-    }, []);
     
 
-  const initializeEntityData = (data) => {
-    functions.initializeEntityData(data, setEntityData);
+   const handleEdit = (index) => {
+    functions.handleEdit(index, activeTab, entities);
   };
 
-  const handleInputChange = (value, key) => {
-    functions.handleInputChange(value, key, entityData, setEntityData);
-  };
-
-  const handleSubmit = (e) => {
-    functions.handleSubmit(e, entityData.id === null, activeTab, entityData, entities, setEntities, selectedEntityIndex, setSelectedEntityIndex, uiElements, setEntityData, postData, updateData, setSearchTerm);
-  };
-
-  const handleEdit = (index) => {
-    functions.handleEdit(index, activeTab, entities, setEntityData, setSelectedEntityIndex);
-  };
-
-  const handleClear = () => {
-    functions.handleClear(activeTab, uiElements, setEntityData);
-  };
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
 
-  const handleSearch = (event) => {
-    functions.handleSearch(event, setSearchTerm);
-  };
+
 
   const filteredEntities = entities.filter(entity => {
     return Object.values(entity).some(value =>
@@ -94,9 +72,6 @@ const MainPage = () => {
     }
   };
 
-  const navigateToCreateCollection = () => {
-    navigate("/create-collection-form");
-  };
 
   const handleReinitializeClick = () => {
     reinitializeSchemas().then(() => {

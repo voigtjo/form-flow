@@ -29,7 +29,7 @@ export const fetchUiElements = async (entity) => {
 };
 
 export const fetchData = async (tab) => {
-  const url = tab === 'user' ? 'http://localhost:5050/user' : `http://localhost:5050/${tab}`;
+  const url = tab === 'user' ? `${BASE_URL}/user` : `${BASE_URL}/${tab}`;
   try {
     const response = await fetch(url);
     const data = await response.json();

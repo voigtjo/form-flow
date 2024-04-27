@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, TextField, Button, Typography } from '@mui/material';
+import { Grid, Button, Typography } from '@mui/material';
 import DynamicComponent from './DynamicComponent';
 import { fetchAttributesByEntity } from './api'; // make sure this is imported
 

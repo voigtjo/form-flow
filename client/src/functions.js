@@ -1,5 +1,4 @@
-import { fetchData, postData, updateData, deleteData } from './api'; // Import API functions
-import { fetchEntityById as fetchEntityByIdFromApi } from './api'; // Import the correct function
+import { fetchData } from './api'; // Import API functions
 
 export const fetchDataForTab = async (activeTab, setEntities) => {
   try {
@@ -10,33 +9,15 @@ export const fetchDataForTab = async (activeTab, setEntities) => {
   }
 };
 
-export const fetchUiElements = async (activeTab, setUiElements, initializeEntityData, setSearchTerm) => {
+export const fetchUiElements = async (activeTab, setUiElements, setSearchTerm) => {
   try {
     const data = await fetchData('ui-elements');
     setUiElements(data);
-    initializeEntityData(data.filter(element => element.entity === activeTab));
   } catch (error) {
     console.error(`Error fetching UI elements:`, error);
   }
 };
 
-export const fetchEntityById = async (entity, id, setEntityData) => {
-  try {
-    const data = await fetchEntityByIdFromApi(entity, id); // Use the correct function
-    setEntityData(data);
-  } catch (error) {
-    console.error(`Error fetching ${entity} by ID ${id}:`, error);
-  }
-};
-
-
-export const initializeEntityData = (data, setEntityData) => {
-  const initialEntityData = data.reduce((acc, curr) => {
-    acc[curr.entityid] = '';
-    return acc;
-  }, { id: null });
-  setEntityData(initialEntityData);
-};
 
 export const handleInputChange = (value, key, entityData, setEntityData) => {
   setEntityData({ ...entityData, [key]: value });
