@@ -88,7 +88,7 @@ const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, en
           />
         );
       default:
-        return <p>Unsupported component type</p>;
+        return <p></p>;
     }
   };
 

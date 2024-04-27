@@ -80,6 +80,10 @@ async function initializeSchemas() {
     for (const entityName in schemas) {
       const capitalizedEntityName = entityName.capitalize();
       if (!mongoose.models[capitalizedEntityName]) { // Check if model already exists
+        console.log(
+          `Creating model ${capitalizedEntityName} with schema:`,
+          schemas[entityName]
+        )
         mongoose.model(capitalizedEntityName, new mongoose.Schema(schemas[entityName]));
       }
     }
