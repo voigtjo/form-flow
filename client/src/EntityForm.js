@@ -14,6 +14,7 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
     });
   }, [components, data]);
 
+
   const handleEntityRefChange = async (entityName, entityid) => {
     try {
       const fetchedAttributes = await fetchAttributesByEntity(entityName);
@@ -21,7 +22,10 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
         label: attr.name,
         value: attr.name
       }));
-      setAttributes(prev => ({ ...prev, [entityid]: formattedAttributes }));
+      setAttributes(prev => {
+        const updatedAttributes = { ...prev, [entityid]: formattedAttributes };
+        return updatedAttributes;
+      });
     } catch (error) {
       console.error(`Error fetching attributes for entity ${entityName}:`, error);
     }
@@ -41,20 +45,34 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
     onClear();
   };
 
-   // Dynamically calculate the max x_pos
-   const maxCols = Math.max(...components.map(comp => parseInt(comp.x_pos, 10)));
+  const maxCols = Math.max(...components.map(comp => parseInt(comp.x_pos, 10)));
 
-   // Compute order with type safety checks
-   const computeOrder = (component) => {
-     const yPos = parseInt(component.y_pos, 10);
-     const xPos = parseInt(component.x_pos, 10);
-     return (yPos - 1) * maxCols + xPos;
-   };
+  const computeOrder = (component) => {
+    const yPos = parseInt(component.y_pos, 10);
+    const xPos = parseInt(component.x_pos, 10);
+    return (yPos - 1) * maxCols + xPos;
+  };
 
-  // Sort components by their computed order
+  const typeOptions = [
+    { label: 'String', value: 'String' },
+    { label: 'Number', value: 'Number' },
+    { label: 'Date', value: 'Date' }
+  ];
+
+  const uiTypeOptions = [
+    { label: 'text', value: 'text' },
+    { label: 'number', value: 'number' },
+    { label: 'email', value: 'email' },
+    { label: 'typeSelect', value: 'typeSelect' },
+    { label: 'uiTypeSelect', value: 'uiTypeSelect' },
+    { label: 'entityRef', value: 'entityRef' },
+    { label: 'entityIdRef', value: 'entityIdRef' },
+    { label: 'checkbox', value: 'checkbox' },
+    { label: 'date', value: 'date' }
+  ];
+
   const sortedComponents = components.sort((a, b) => computeOrder(a) - computeOrder(b));
 
-  // Fill gaps with placeholder components
   const filledComponents = [];
   let expectedOrder = 1;
   sortedComponents.forEach(component => {
@@ -62,11 +80,12 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
     while (expectedOrder < currentOrder) {
       filledComponents.push(
         <Grid key={`placeholder-${expectedOrder}`} item xs={12 / maxCols}>
-          <p></p> 
+          <p></p>
         </Grid>
       );
       expectedOrder++;
     }
+    
     filledComponents.push(
       <Grid key={component.entityid} item xs={12 / maxCols}>
         <DynamicComponent
@@ -77,12 +96,15 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
           onChange={handleInputChange}
           value={data ? data[component.entityid] || '' : ''}
           entityid={component.entityid}
-          options={component.type === 'entityRef' ? collections :
-                  component.type === 'entityIdRef' ? attributes[component.entityid] : undefined}
+          options={
+            component.type === 'uiTypeSelect' ? uiTypeOptions :
+            component.type === 'typeSelect' ? typeOptions :
+            component.type === 'entityRef' ? collections :
+            component.type === 'entityIdRef' ? attributes['entity'] || [] : []}
         />
       </Grid>
     );
-    expectedOrder++;  // Increment to expect the next order
+    expectedOrder++;
   });
 
   return (

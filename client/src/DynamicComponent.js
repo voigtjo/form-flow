@@ -5,14 +5,9 @@ import { LocalizationProvider, DesktopDatePicker } from '@mui/x-date-pickers';
 
 const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, entityid, options = [] }) => {
 
-  const handleInputChange = (newValue) => {
-    if (newValue instanceof Date || typeof newValue === 'string' || typeof newValue === 'number') {
-      onChange(newValue, entityid);
-    } else if (newValue.target.type === 'checkbox') {
-      onChange(newValue.target.checked, entityid);
-    } else {
-      onChange(newValue.target.value, entityid);
-    }
+  const handleInputChange = (event) => {
+    const newValue = event.target.value;
+    onChange(newValue, entityid);
   };
 
   const renderComponent = () => {
@@ -31,6 +26,24 @@ const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, en
             autoComplete={type === 'email' ? "email" : undefined}
           />
         );
+      case 'uiTypeSelect':  // Dropdown for selecting attribute types
+      case 'typeSelect':  // Dropdown for selecting attribute types
+        return (
+          <TextField
+            select
+            label={label}
+            fullWidth={fullWidth}
+            variant={variant}
+            value={value}
+            onChange={handleInputChange}
+          >
+            {options.map((option, index) => (
+              <MenuItem key={index} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        );
       case 'entityRef': // Handle entity references (dropdown)
         return (
           <TextField
@@ -48,55 +61,48 @@ const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, en
             ))}
           </TextField>
         );
-        case 'entityIdRef':
-          if (options.length === 0) {
-            return <TextField label={label} fullWidth={fullWidth} variant={variant} disabled />;
-          }
-          return (
-            <TextField
-                select
-                label={label}
-                fullWidth={fullWidth}
-                variant={variant}
-                value={value || ''}  // Ensure there's a valid fallback
-                onChange={(e) => onChange(e.target.value, entityid)}
-            >
-              {options.map((option, index) => (
-                <MenuItem key={index} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-          );
-        
-        
+      case 'entityIdRef':
+        return (
+          <TextField
+            select
+            label={label}
+            fullWidth={fullWidth}
+            variant={variant}
+            value={value || ''}
+            onChange={handleInputChange}
+          >
+            {options.map((option, index) => (
+              <MenuItem key={index} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        );
       case 'checkbox':
         return (
           <FormControlLabel
-            control={<Checkbox checked={value || false} onChange={handleInputChange} color="primary" />}
+            control={<Checkbox checked={!!value} onChange={(e) => handleInputChange(e)} color="primary" />}
             label={label}
           />
         );
       case 'date':
         return (
-          <DesktopDatePicker
-            label={label}
-            inputFormat="MM/dd/yyyy"
-            value={value || null}
-            onChange={handleInputChange}
-            renderInput={(params) => <TextField {...params} fullWidth={fullWidth} variant={variant} />}
-          />
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DesktopDatePicker
+              label={label}
+              inputFormat="MM/dd/yyyy"
+              value={value || null}
+              onChange={(newDate) => onChange(newDate, entityid)}
+              renderInput={(params) => <TextField {...params} fullWidth={fullWidth} variant={variant} />}
+            />
+          </LocalizationProvider>
         );
       default:
-        return <p></p>;
+        return <p>Unsupported type</p>;
     }
   };
 
-  return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      {renderComponent()}
-    </LocalizationProvider>
-  );
+  return renderComponent();
 };
 
 export default DynamicComponent;

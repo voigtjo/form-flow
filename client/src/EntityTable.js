@@ -5,11 +5,22 @@ import { useNavigate } from 'react-router-dom';
 const EntityTable = ({ entities, tableColumns, activeTab, searchTerm, setSearchTerm }) => {
   const [sortBy, setSortBy] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
-  const navigate = useNavigate(); // Add useNavigate hook
+  const navigate = useNavigate();
 
   useEffect(() => {
     setSearchTerm('');
-  }, [activeTab, setSearchTerm]); // Include setSearchTerm in the dependency array
+  }, [activeTab, setSearchTerm]);
+
+  const maxCols = Math.max(...tableColumns.map(col => parseInt(col.x_pos, 10)));
+
+  const computeOrder = (column) => {
+    const yPos = parseInt(column.y_pos, 10);
+    const xPos = parseInt(column.x_pos, 10);
+    return (yPos - 1) * maxCols + xPos;
+  };
+
+  // Sort tableColumns based on the computed order
+  const sortedColumns = [...tableColumns].sort((a, b) => computeOrder(a) - computeOrder(b));
 
   const handleSort = (column) => {
     if (sortBy === column) {
@@ -21,10 +32,10 @@ const EntityTable = ({ entities, tableColumns, activeTab, searchTerm, setSearchT
   };
 
   const sortedEntities = [...entities].sort((a, b) => {
-    if (sortBy && a[sortBy] && b[sortBy]) { // Add null check for properties
+    if (sortBy && a[sortBy] && b[sortBy]) {
       const columnA = a[sortBy].toString().toLowerCase();
       const columnB = b[sortBy].toString().toLowerCase();
-  
+
       if (columnA < columnB) return sortDirection === 'asc' ? -1 : 1;
       if (columnA > columnB) return sortDirection === 'asc' ? 1 : -1;
     }
@@ -32,21 +43,16 @@ const EntityTable = ({ entities, tableColumns, activeTab, searchTerm, setSearchT
   });
 
   const sortedAndFilteredEntities = sortedEntities.filter(entity => {
-    // Filter by search term
-    const searchMatches = searchTerm === '' || Object.keys(entity).some(key => {
+    return searchTerm === '' || Object.keys(entity).some(key => {
       if (key !== '_id' && key !== 'id') {
-        const value = entity[key] ? entity[key].toString().toLowerCase() : ''; // Add null check
+        const value = entity[key] ? entity[key].toString().toLowerCase() : '';
         return value.includes(searchTerm.toLowerCase());
       }
       return false;
     });
-
-    return searchMatches;
   });
 
   const handleEdit = (entityId) => {
-    console.log("handleEdit: activeTab= " + activeTab + ", entityId= " + entityId);
-    // Navigate to EntityFormWrapper with the appropriate parameters
     navigate(`/${activeTab}/${entityId}`);
   };
 
@@ -63,7 +69,7 @@ const EntityTable = ({ entities, tableColumns, activeTab, searchTerm, setSearchT
           <Table>
             <TableHead>
               <TableRow>
-                {tableColumns.map(column => (
+                {sortedColumns.map(column => (
                   <TableCell key={column.entityid} 
                     onClick={() => handleSort(column.entityid)}
                     sx={{ fontWeight: 'bold', cursor: 'pointer' }}
@@ -80,11 +86,10 @@ const EntityTable = ({ entities, tableColumns, activeTab, searchTerm, setSearchT
             <TableBody>
               {sortedAndFilteredEntities.map((entity, index) => (
                 <TableRow key={index}>
-                  {tableColumns.map(column => (
+                  {sortedColumns.map(column => (
                     <TableCell key={column.entityid}>{entity[column.entityid]}</TableCell>
                   ))}
                   <TableCell>
-                    {/* Pass entityId to handleEdit function */}
                     <Button onClick={() => handleEdit(entity.id)} variant="outlined" color="primary">
                       Edit
                     </Button>
