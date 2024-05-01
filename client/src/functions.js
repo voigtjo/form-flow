@@ -76,7 +76,7 @@ export const handleNewEntity = async (activeTab, uiElements, postData) => {
 
     // Submit postData with the empty entity
     // const newEntity = await postData(activeTab, emptyEntity);
-    console.log("handleNewEntity: emptyEntity:" + emptyEntity);
+
     const newEntity = emptyEntity;
     
     return newEntity;

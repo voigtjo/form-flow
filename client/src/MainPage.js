@@ -13,7 +13,7 @@ import { listCollections, reinitializeSchemas, postData } from './api'; // Make 
 
 
 
-const MainPage = () => {
+const MainPage = ({ selectedEntity: selectedEntityFromProps }) => {
   const navigate = useNavigate();
   const location = useLocation(); // Get location object
   const queryParams = queryString.parse(location.search); // Parse query parameters
@@ -23,21 +23,32 @@ const MainPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true); // State to track sidebar visibility
 
-  const [selectedEntity, setSelectedEntity] = useState('');
+  const [selectedEntity, setSelectedEntity] = useState(queryParams.selectedEntity || '');
   const [entityOptions, setEntityOptions] = useState([]);
   
   
   useEffect(() => {
     if (['attribute', 'uielement'].includes(activeTab)) {
-      listCollections().then(collections => {
-        setEntityOptions(collections.map(name => ({ label: name, value: name })));
-      }).catch(error => console.error('Failed to fetch collections:', error));
+      listCollections()
+        .then(collections => {
+          setEntityOptions(collections.map(name => ({ label: name, value: name })));
+          // Check if the current selectedEntity is still valid after fetching collections
+          if (!collections.includes(selectedEntity)) {
+            setSelectedEntity('');
+          }
+        })
+        .catch(error => console.error('Failed to fetch collections:', error));
     } else {
       setSelectedEntity(''); // Reset the selected entity when not in attribute or uielement tab
     }
-  }, [activeTab]);
-  
-  
+  }, [activeTab, selectedEntity]);
+
+  useEffect(() => {
+    // Set selectedEntity to the passed value from EntityFormWrapper if it's not empty
+    if (selectedEntityFromProps) {
+      setSelectedEntity(selectedEntityFromProps);
+    }
+  }, [selectedEntityFromProps]);
   
 
   useEffect(() => {
@@ -66,6 +77,8 @@ const MainPage = () => {
   };
 
 
+
+
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
@@ -82,16 +95,16 @@ const filteredEntities = entities.filter(entity => {
 });
 
 
+
   const handleNewEntity = async () => {
     try {
-      const newEntity = await functions.handleNewEntity(activeTab, uiElements, postData);
-      console.log("handleNewEntity: newEntity.id=" + newEntity.id + ", newEntity._id=" + newEntity._id);
-      console.log(newEntity);
-      navigate(`/${activeTab}`);
+      const newEntity = await functions.handleNewEntity(activeTab, uiElements, postData, selectedEntity);
+      navigate(`/${activeTab}?selectedEntity=${selectedEntity}`);
     } catch (error) {
       console.error('Error creating new entity:', error);
     }
   };
+  
 
 
   const handleReinitializeClick = () => {

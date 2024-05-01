@@ -61,7 +61,7 @@ const EntityTable = ({
   });
 
   const handleEdit = (entityId) => {
-    navigate(`/${activeTab}/${entityId}`);
+    navigate(`/${activeTab}/${entityId}?selectedEntity=${selectedEntity}`);
   };
 
   return (
