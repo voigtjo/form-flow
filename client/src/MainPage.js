@@ -5,11 +5,13 @@ import EntityTable from './EntityTable';
 import Sidebar from './Sidebar'; // Import the Sidebar component
 import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation hook
 import queryString from 'query-string'; // Import queryString library
-import { postData } from './api'; // Import API functions
 import * as functions from './functions'; // Import functions
 import { IconButton } from '@mui/material'; // Import IconButton from Material-UI
 import MenuIcon from '@mui/icons-material/Menu'; // Import MenuIcon from Material-UI
-import {reinitializeSchemas } from './api'; // Add reinitializeSchemas to your imports
+import { listCollections, reinitializeSchemas, postData } from './api'; // Make sure listCollections is correctly imported
+
+
+
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -21,7 +23,22 @@ const MainPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true); // State to track sidebar visibility
 
-
+  const [selectedEntity, setSelectedEntity] = useState('');
+  const [entityOptions, setEntityOptions] = useState([]);
+  
+  
+  useEffect(() => {
+    if (['attribute', 'uielement'].includes(activeTab)) {
+      listCollections().then(collections => {
+        setEntityOptions(collections.map(name => ({ label: name, value: name })));
+      }).catch(error => console.error('Failed to fetch collections:', error));
+    } else {
+      setSelectedEntity(''); // Reset the selected entity when not in attribute or uielement tab
+    }
+  }, [activeTab]);
+  
+  
+  
 
   useEffect(() => {
     functions.fetchDataForTab(activeTab, setEntities);
@@ -54,12 +71,16 @@ const MainPage = () => {
   };
 
 
+// Filter entities not just by search term, but also by selectedEntity if applicable
+const filteredEntities = entities.filter(entity => {
+  const matchesSearchTerm = Object.values(entity).some(value =>
+    value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  // Check if the entity matches the selectedEntity, if one is selected
+  const matchesSelectedEntity = selectedEntity === '' || entity.entity === selectedEntity;
+  return matchesSearchTerm && matchesSelectedEntity;
+});
 
-  const filteredEntities = entities.filter(entity => {
-    return Object.values(entity).some(value =>
-      value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
 
   const handleNewEntity = async () => {
     try {
@@ -124,6 +145,9 @@ const MainPage = () => {
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               onTabChange={handleTabChange}
+              selectedEntity={selectedEntity}
+              setSelectedEntity={setSelectedEntity}
+              entityOptions={entityOptions}
             />
           </TableContainer>
         )}

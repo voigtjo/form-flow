@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Box } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, MenuItem, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const EntityTable = ({ entities, tableColumns, activeTab, searchTerm, setSearchTerm }) => {
+const EntityTable = ({
+  entities, 
+  tableColumns, 
+  activeTab, 
+  searchTerm, 
+  setSearchTerm, 
+  selectedEntity,
+  setSelectedEntity,
+  entityOptions
+}) => {
   const [sortBy, setSortBy] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
   const navigate = useNavigate();
@@ -19,7 +28,6 @@ const EntityTable = ({ entities, tableColumns, activeTab, searchTerm, setSearchT
     return (yPos - 1) * maxCols + xPos;
   };
 
-  // Sort tableColumns based on the computed order
   const sortedColumns = [...tableColumns].sort((a, b) => computeOrder(a) - computeOrder(b));
 
   const handleSort = (column) => {
@@ -58,48 +66,65 @@ const EntityTable = ({ entities, tableColumns, activeTab, searchTerm, setSearchT
 
   return (
     <Box pt={2}>
-      <TextField
-        label="Search"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        style={{ marginBottom: 20 }}
-      />
-      <Box>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                {sortedColumns.map(column => (
-                  <TableCell key={column.entityid} 
-                    onClick={() => handleSort(column.entityid)}
-                    sx={{ fontWeight: 'bold', cursor: 'pointer' }}
-                  >
-                    {column.label}
-                    {sortBy === column.entityid && (
-                      <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
-                    )}
-                  </TableCell>
-                ))}
-                <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sortedAndFilteredEntities.map((entity, index) => (
-                <TableRow key={index}>
-                  {sortedColumns.map(column => (
-                    <TableCell key={column.entityid}>{entity[column.entityid]}</TableCell>
-                  ))}
-                  <TableCell>
-                    <Button onClick={() => handleEdit(entity.id)} variant="outlined" color="primary">
-                      Edit
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <TextField
+          label="Search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ marginRight: 20, flexGrow: 1 }}
+        />
+        {['attribute', 'uielement'].includes(activeTab) && (
+          <TextField
+            select
+            label="Select Entity"
+            value={selectedEntity}
+            onChange={(e) => setSelectedEntity(e.target.value)}
+            style={{ width: 200 }}
+          >
+            <MenuItem value="">None</MenuItem>
+            {entityOptions.map((option, index) => (
+              <MenuItem key={index} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
       </Box>
+
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              {sortedColumns.map(column => (
+                <TableCell key={column.entityid} 
+                  onClick={() => handleSort(column.entityid)}
+                  sx={{ fontWeight: 'bold', cursor: 'pointer' }}
+                >
+                  {column.label}
+                  {sortBy === column.entityid && (
+                    <span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>
+                  )}
+                </TableCell>
+              ))}
+              <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {sortedAndFilteredEntities.map((entity, index) => (
+              <TableRow key={index}>
+                {sortedColumns.map(column => (
+                  <TableCell key={column.entityid}>{entity[column.entityid]}</TableCell>
+                ))}
+                <TableCell>
+                  <Button onClick={() => handleEdit(entity.id)} variant="outlined" color="primary">
+                    Edit
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 };
