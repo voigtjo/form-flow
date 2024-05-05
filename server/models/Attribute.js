@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const AttributeSchema = new mongoose.Schema({
   name: String,
   type: String,
-  entity: String
+  entity: String,
+  ref:String
 });
 
 // Define a model for attribute definitions

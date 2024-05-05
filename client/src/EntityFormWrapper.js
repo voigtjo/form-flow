@@ -56,6 +56,7 @@ const EntityFormWrapper = () => {
         updatedData = await postData(endpoint, entityData);
         navigate(`/${entity}/${updatedData._id}`);
       } else {
+        console.log('handleSubmit: entityData', entityData);
         updatedData = await updateData(endpoint, entityData);
       }
       setEntityData(updatedData);
@@ -70,7 +71,6 @@ const EntityFormWrapper = () => {
 
   const handleBack = () => {
     const navigationString = `/?activeTab=${entity}&selectedEntity=${selectedEntity}`;
-    console.log('handleBack: navigationString:', navigationString);
     navigate(navigationString);
   };
   

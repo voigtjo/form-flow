@@ -20,6 +20,7 @@ export const fetchUiElements = async (activeTab, setUiElements, setSearchTerm) =
 
 
 export const handleInputChange = (value, key, entityData, setEntityData) => {
+  console.log("functions.handleInputChange: value= " + value + ", key= " + key);
   setEntityData({ ...entityData, [key]: value });
 };
 

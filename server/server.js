@@ -71,6 +71,7 @@ async function initializeSchemas() {
       if (!schemas[entity]) {
         schemas[entity] = {};
       }
+      //console.log("1) entity:" + entity + ", name:" + name + ", type:" + type);
       if (!mongoose.models[name.capitalize()]) { // Check if model already exists
         schemas[entity][name] = mongoose.Schema.Types[type];
       }
@@ -79,7 +80,9 @@ async function initializeSchemas() {
     // Define mongoose models based on schemas
     for (const entityName in schemas) {
       const capitalizedEntityName = entityName.capitalize();
+      
       if (!mongoose.models[capitalizedEntityName]) { // Check if model already exists
+        //console.log("2) entityName:" + entityName + ", capitalizedEntityName:" + capitalizedEntityName);
         mongoose.model(capitalizedEntityName, new mongoose.Schema(schemas[entityName]));
       }
     }
@@ -243,6 +246,7 @@ app.get('/:entity', async (req, res) => {
 // Route for finding a dataset by ID
 app.get('/:entity/:id', async (req, res) => {
   const { entity, id } = req.params;
+  console.log("GET: entity:" + entity + ", id:" + id);
   try {
     if (!schemas || !schemas[entity]) {
       return res.status(404).json({ message: `Schema for ${entity} not found` });
@@ -250,8 +254,11 @@ app.get('/:entity/:id', async (req, res) => {
     
     const EntityModel = mongoose.models[entity.capitalize()] || mongoose.model(entity.capitalize(), new mongoose.Schema(schemas[entity]));
     const dataset = await EntityModel.findById(id);
-    if (!dataset) return res.status(404).json({ message: `${entity.capitalize()} not found` });
-    
+    if (!dataset) {
+      console.log("GET: dataset not found");
+      return res.status(404).json({ message: `${entity.capitalize()} not found` });
+    }
+    console.log("RESULT GET: dataset:" + dataset);
     res.json(dataset);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -274,9 +281,13 @@ app.post('/:entity', async (req, res) => {
 // Generic route for updating entities
 app.put('/:entity/:id', async (req, res) => {
   const { entity, id } = req.params;
+  console.log("PUT: entity:" + entity + ", id:" + id);
+  console.log(req.body);
   try {
     const EntityModel = mongoose.models[entity.capitalize()] || mongoose.model(entity.capitalize(), new mongoose.Schema(schemas[entity]));
+    //console.log("PUT: EntityModel:" + EntityModel + ", schemas[entity]=" + schemas[entity]);
     const updatedEntity = await EntityModel.findByIdAndUpdate(id, req.body, { new: true });
+    console.log("RESULT PUT: updatedEntity:" + updatedEntity);
     if (!updatedEntity) return res.status(404).json({ message: `${entity.capitalize()} not found` });
     res.json(updatedEntity);
   } catch (error) {

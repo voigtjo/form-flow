@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Button, Typography } from '@mui/material';
 import DynamicComponent from './DynamicComponent';
-import { fetchAttributesByEntity } from './api';
+import { fetchAttributesByEntity, fetchData } from './api';
 
 const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, name, collections }) => {
   const [attributes, setAttributes] = useState({});
+  const [datasets, setDatasets] = useState({});
 
   useEffect(() => {
     components.forEach(component => {
       if (component.type === 'entityRef' && data[component.entityid]) {
         handleEntityRefChange(data[component.entityid], component.entityid);
+      } else if (component.type === 'ref') {
+        handleRefChanges(component.entityid);
       }
     });
   }, [components, data]);
@@ -28,6 +31,21 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
       });
     } catch (error) {
       console.error(`Error fetching attributes for entity ${entityName}:`, error);
+    }
+  };
+
+  const handleRefChanges = async (entityid) => {
+    console.log("handleRefChanges: entityid= " + entityid);
+    try {
+      const fetchedData = await fetchData(entityid);
+      const formattedData = fetchedData.map(item => ({
+        label: item.name,  // Assuming 'name' is the field to display
+        value: item._id  // Assuming '_id' is the unique identifier
+      }));
+      console.log("handleRefChanges: formattedData= ", formattedData);
+      setDatasets(prev => ({ ...prev, [entityid]: formattedData }));
+    } catch (error) {
+      console.error(`Error fetching data for ${entityid}:`, error);
     }
   };
 
@@ -56,7 +74,8 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
   const typeOptions = [
     { label: 'String', value: 'String' },
     { label: 'Number', value: 'Number' },
-    { label: 'Date', value: 'Date' }
+    { label: 'Date', value: 'Date' },
+    { label: 'Ref', value: 'Ref' },
   ];
 
   const uiTypeOptions = [
@@ -65,6 +84,7 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
     { label: 'email', value: 'email' },
     { label: 'typeSelect', value: 'typeSelect' },
     { label: 'uiTypeSelect', value: 'uiTypeSelect' },
+    { label: 'ref', value: 'ref' },
     { label: 'entityRef', value: 'entityRef' },
     { label: 'entityIdRef', value: 'entityIdRef' },
     { label: 'checkbox', value: 'checkbox' },
@@ -99,6 +119,7 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
           options={
             component.type === 'uiTypeSelect' ? uiTypeOptions :
             component.type === 'typeSelect' ? typeOptions :
+            component.type === 'ref' ? datasets[component.entityid] || [] :
             component.type === 'entityRef' ? collections :
             component.type === 'entityIdRef' ? attributes['entity'] || [] : []}
         />

@@ -9,7 +9,9 @@ const UIElementSchema = new mongoose.Schema({
     default: 'string'
   },
   entity: String,
-  entityid: String
+  entityid: String,
+  x_pos: Number,
+  y_pos: Number
 });
 
 // Define a model for UI elements

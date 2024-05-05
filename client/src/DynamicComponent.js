@@ -7,6 +7,7 @@ const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, en
 
   const handleInputChange = (event) => {
     const newValue = event.target.value;
+    console.log("DynamicComponent.handleInputChange: newValue= " + newValue+ ", entityid= " + entityid);
     onChange(newValue, entityid);
   };
 
@@ -26,25 +27,11 @@ const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, en
             autoComplete={type === 'email' ? "email" : undefined}
           />
         );
+      case 'ref':  // Dropdown for selecting attribute types
       case 'uiTypeSelect':  // Dropdown for selecting attribute types
       case 'typeSelect':  // Dropdown for selecting attribute types
-        return (
-          <TextField
-            select
-            label={label}
-            fullWidth={fullWidth}
-            variant={variant}
-            value={value}
-            onChange={handleInputChange}
-          >
-            {options.map((option, index) => (
-              <MenuItem key={index} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-        );
       case 'entityRef': // Handle entity references (dropdown)
+      case 'entityIdRef': // Handle entity references (dropdown)
         return (
           <TextField
             select
@@ -52,23 +39,6 @@ const DynamicComponent = ({ type, label, onChange, value, fullWidth, variant, en
             fullWidth={fullWidth}
             variant={variant}
             value={value}
-            onChange={handleInputChange}
-          >
-            {options.map((option, index) => (
-              <MenuItem key={index} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-        );
-      case 'entityIdRef':
-        return (
-          <TextField
-            select
-            label={label}
-            fullWidth={fullWidth}
-            variant={variant}
-            value={value || ''}
             onChange={handleInputChange}
           >
             {options.map((option, index) => (

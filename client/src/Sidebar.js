@@ -37,7 +37,7 @@ const Sidebar = ({
 
 
 
-      <Typography variant="h5" style={{ marginTop: '16px' }}>User Panel</Typography>
+      <Typography variant="h5" style={{ marginTop: '16px' }}>Entiy Forms Panel</Typography>
       {Array.from(new Set(uiElements.map(element => element.entity)))
         .filter(tab => tab !== 'attribute' && tab !== 'uielement')
         .map((tab, index) => (

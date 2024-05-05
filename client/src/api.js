@@ -30,9 +30,11 @@ export const fetchUiElements = async (entity) => {
 
 export const fetchData = async (tab) => {
   const url = tab === 'user' ? `${BASE_URL}/user` : `${BASE_URL}/${tab}`;
+  //console.log("api.fetchData IN: url= " + url);
   try {
     const response = await fetch(url);
     const data = await response.json();
+    //console.log("api.fetchData OUT: data= ", data);
     return data;
   } catch (error) {
     throw new Error(`Error fetching ${tab} data: ${error.message}`);
@@ -41,7 +43,9 @@ export const fetchData = async (tab) => {
 
 export const fetchEntityById = async (entity, id) => {
   try {
-    const response = await fetch(`${BASE_URL}/${entity}/${id}`);
+    const url = `${BASE_URL}/${entity}/${id}`;
+    console.log("api.fetchEntityById: url= " + url);
+    const response = await fetch(url);
     const data = await response.json();
     return data;
   } catch (error) {
@@ -134,6 +138,7 @@ export const postData = async (endpoint, body) => {
 
 // Update the updateData function
 export const updateData = async (endpoint, body) => {
+  console.log("1) api.updateData: endpoint= " + endpoint + ", body.json= " + JSON.stringify(body));
   try {
     const response = await fetch(`${BASE_URL}/${endpoint}`, {
       method: 'PUT',
@@ -143,6 +148,7 @@ export const updateData = async (endpoint, body) => {
       body: JSON.stringify(body),
     });
     const updatedData = await response.json();
+    console.log("2) api.updateData: updatedData= ", updatedData);
     return updatedData;
   } catch (error) {
     console.error(`Error updating data at ${endpoint}:`, error);
