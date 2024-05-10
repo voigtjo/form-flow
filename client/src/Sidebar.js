@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const Sidebar = ({
   navigateToCreateCollection,
@@ -51,6 +52,13 @@ const Sidebar = ({
             {tab.charAt(0).toUpperCase() + tab.slice(1)} Form
           </Button>
         ))}
+
+      <Typography variant="h5" style={{ marginTop: '16px' }}>Layout Panel</Typography>
+      <Link to="/layout-renderer">
+        <Button variant="outlined" color="primary" fullWidth>
+          LayoutRenderer
+        </Button>
+      </Link>
     </div>
   );
 };
