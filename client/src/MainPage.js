@@ -3,6 +3,7 @@ import {Grid, Button, TableContainer, Paper, Box } from '@mui/material'; // Impo
 
 import EntityTable from './EntityTable';
 import Sidebar from './Sidebar'; // Import the Sidebar component
+import Multiselector from './Multiselector';
 import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation hook
 import queryString from 'query-string'; // Import queryString library
 import * as functions from './functions'; // Import functions
@@ -13,7 +14,7 @@ import { listCollections, reinitializeSchemas, postData } from './api'; // Make 
 
 
 
-const MainPage = ({ selectedEntity: selectedEntityFromProps }) => {
+const MainPage = ({ selectedEntity: selectedEntityFromProps, sections, setSections }) => {
   const navigate = useNavigate();
   const location = useLocation(); // Get location object
   const queryParams = queryString.parse(location.search); // Parse query parameters
@@ -25,7 +26,8 @@ const MainPage = ({ selectedEntity: selectedEntityFromProps }) => {
 
   const [selectedEntity, setSelectedEntity] = useState(queryParams.selectedEntity || '');
   const [entityOptions, setEntityOptions] = useState([]);
-  
+
+ 
   
   useEffect(() => {
     if (['attribute', 'uielement'].includes(activeTab)) {
@@ -118,14 +120,16 @@ const filteredEntities = entities.filter(entity => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={3}>
-        <Sidebar
-          navigateToCreateCollection={() => navigate("/create-collection-form")}
-          handleReinitializeClick={handleReinitializeClick}
-          handleTabChange={handleTabChange}
-          uiElements={uiElements}
-          activeTab={activeTab}
-          sidebarOpen={sidebarOpen}
-        />
+          <Multiselector sections={sections} setSections={setSections} />
+          <Sidebar
+              navigateToCreateCollection={() => navigate("/create-collection-form")}
+              handleReinitializeClick={handleReinitializeClick}
+              handleTabChange={handleTabChange}
+              uiElements={uiElements}
+              activeTab={activeTab}
+              sidebarOpen={sidebarOpen}
+              sections={sections}
+          />
       </Grid>
       <Grid item xs={9}>
         <Box mt={4} mb={4} display="flex" justifyContent="space-between">
