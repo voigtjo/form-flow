@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Typography, List, ListItem } from '@mui/material';
-import { createCollection, listCollections } from './api'; // Ensure this is correctly imported
+import { createCollection, listCollections } from './api';
 
-const CreateCollectionForm = () => {
+const CreateCollectionForm = ({ token }) => {
   const [collectionName, setCollectionName] = useState('');
   const [collections, setCollections] = useState([]);
   const navigate = useNavigate();
 
-  // Correctly move fetchCollections outside of useEffect for accessibility
   const fetchCollections = async () => {
     try {
-      const collections = await listCollections();
+      const collections = await listCollections(token);
       setCollections(collections);
     } catch (error) {
       console.error('Failed to fetch collections:', error);
@@ -20,14 +19,14 @@ const CreateCollectionForm = () => {
 
   useEffect(() => {
     fetchCollections();
-  }, []);
+  }, [token]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      await createCollection(collectionName); // Assuming the API function correctly handles the creation logic
-      setCollectionName(''); // Clear input field after successful creation
-      fetchCollections(); // Refresh collections list
+      await createCollection(collectionName, [], token);
+      setCollectionName('');
+      fetchCollections();
     } catch (error) {
       console.error('Failed to create collection:', error);
     }

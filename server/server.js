@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const Attribute = require('./models/Attribute'); // Import the Attribute model
 const UIElement = require('./models/UIElement'); // Import the UIElement model
+const auth = require('./middleware/auth'); // Import the authentication middleware
+const authRoutes = require('./routes/auth'); // Import the authentication routes
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -15,7 +17,7 @@ const URI = process.env.ATLAS_URI || "";
 console.log("URI:" + URI);
 
 mongoose.connect(URI, {
-  dbName: 'employees',
+  dbName: 'testapp',
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -51,13 +53,12 @@ async function reconnectDatabase() {
           useNewUrlParser: true,
           useUnifiedTopology: true
       });
-      console.log('Reconnected to MongoDB successfully');
+      console.log('Reconnected to MongoDB successfully:', dbName);
   } catch (error) {
-      console.error('Failed to reconnect to MongoDB:', error);
+      console.error('Failed to reconnect to MongoDB:', dbName , error);
       throw error;  // Rethrowing the error to handle it in the calling function
   }
 }
-
 
 // Initialize schemas dynamically based on attributes fetched from MongoDB
 async function initializeSchemas() {
@@ -105,7 +106,6 @@ initializeSchemas()
     process.exit(1);
   });
 
-
 // Endpoint to reinitialize schemas
 app.get('/reinitialize-schemas', async (req, res) => {
   try {
@@ -119,7 +119,6 @@ app.get('/reinitialize-schemas', async (req, res) => {
   }
 });
 
-
 // Fetch UI elements from MongoDB
 async function fetchUIElements() {
   try {
@@ -131,7 +130,7 @@ async function fetchUIElements() {
   }
 }
 
-app.post('/create-collection', async (req, res) => {
+app.post('/create-collection', auth, async (req, res) => {
   const { collectionName } = req.body; // Assume the input name is the singular form of the collection name
   const pluralize = require('pluralize');
 
@@ -175,10 +174,7 @@ app.post('/create-collection', async (req, res) => {
   }
 });
 
-
-
-
-app.get('/list-collections', async (req, res) => {
+app.get('/list-collections', auth, async (req, res) => {
   const pluralize = require('pluralize');
   try {
       // Get a list of all collections in the database
@@ -194,9 +190,8 @@ app.get('/list-collections', async (req, res) => {
   }
 });
 
-
 // Route for fetching attributes by entity
-app.get('/attributes/:entity', async (req, res) => {
+app.get('/attributes/:entity', auth, async (req, res) => {
   const { entity } = req.params;
 
   try {
@@ -211,9 +206,8 @@ app.get('/attributes/:entity', async (req, res) => {
   }
 });
 
-
 // Route for fetching UI elements
-app.get('/ui-elements', async (req, res) => {
+app.get('/ui-elements', auth, async (req, res) => {
   try {
     const uiElements = await fetchUIElements();
     res.json(uiElements);
@@ -222,9 +216,8 @@ app.get('/ui-elements', async (req, res) => {
   }
 });
 
-
 // Generic route for fetching entities
-app.get('/:entity', async (req, res) => {
+app.get('/:entity', auth, async (req, res) => {
   const { entity } = req.params;
   try {
     if (!schemas || !schemas[entity]) {
@@ -244,7 +237,7 @@ app.get('/:entity', async (req, res) => {
 });
 
 // Route for finding a dataset by ID
-app.get('/:entity/:id', async (req, res) => {
+app.get('/:entity/:id', auth, async (req, res) => {
   const { entity, id } = req.params;
   console.log("GET: entity:" + entity + ", id:" + id);
   try {
@@ -266,7 +259,7 @@ app.get('/:entity/:id', async (req, res) => {
 });
 
 // Generic route for creating entities
-app.post('/:entity', async (req, res) => {
+app.post('/:entity', auth, async (req, res) => {
   const { entity } = req.params;
   try {
     const EntityModel = mongoose.models[entity.capitalize()] || mongoose.model(entity.capitalize(), new mongoose.Schema(schemas[entity]));
@@ -279,7 +272,7 @@ app.post('/:entity', async (req, res) => {
 });
 
 // Generic route for updating entities
-app.put('/:entity/:id', async (req, res) => {
+app.put('/:entity/:id', auth, async (req, res) => {
   const { entity, id } = req.params;
   console.log("PUT: entity:" + entity + ", id:" + id);
   console.log(req.body);
@@ -296,7 +289,7 @@ app.put('/:entity/:id', async (req, res) => {
 });
 
 // Generic route for deleting entities
-app.delete('/:entity/:id', async (req, res) => {
+app.delete('/:entity/:id', auth, async (req, res) => {
   const { entity, id } = req.params;
   try {
     const EntityModel = mongoose.models[entity.capitalize()] || mongoose.model(entity.capitalize(), new mongoose.Schema(schemas[entity]));
@@ -308,6 +301,8 @@ app.delete('/:entity/:id', async (req, res) => {
   }
 });
 
+// Use authentication routes
+app.use('/auth', authRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

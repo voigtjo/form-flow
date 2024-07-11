@@ -3,9 +3,9 @@ import { useParams } from 'react-router-dom';
 import { Grid, Box, TableContainer, Paper, Button } from '@mui/material';
 
 import EntityTable from './EntityTable';
-import { fetchDataForTab, fetchUiElements } from './functions'; // These functions should already be defined as they are used in MainPage
+import { fetchDataForTab, fetchUiElementsData } from './functions'; // Ensure functions are correctly imported
 
-const EntityTableWrapper = () => {
+const EntityTableWrapper = ({ token }) => {
   const { entity } = useParams(); // This captures the entity as activeTab from the URL
   const [entities, setEntities] = useState([]);
   const [uiElements, setUiElements] = useState([]);
@@ -13,10 +13,9 @@ const EntityTableWrapper = () => {
   const [selectedEntity, setSelectedEntity] = useState(''); // Initially no entity is selected
 
   useEffect(() => {
-    fetchDataForTab(entity, setEntities); // Fetch entities for this specific entity type
-    fetchUiElements(entity, setUiElements, () => {}); // Fetch UI elements related to the entity
-    // setSearchTerm(''); // Clear search term if needed upon loading new entity data
-  }, [entity]);
+    fetchDataForTab(entity, setEntities, token); // Fetch entities for this specific entity type with token
+    fetchUiElementsData(entity, setUiElements, token); // Fetch UI elements related to the entity with token
+  }, [entity, token]);
 
   // Mimic MainPage's entity filtering logic
   const filteredEntities = entities.filter(ent => {

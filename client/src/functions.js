@@ -1,37 +1,35 @@
-import { fetchData } from './api'; // Import API functions
+import { fetchData, postData, updateData } from './api'; // Import API functions
 
-export const fetchDataForTab = async (activeTab, setEntities) => {
+export const fetchDataForTab = async (activeTab, setEntities, token) => {
   try {
-    const data = await fetchData(activeTab);
+    const data = await fetchData(activeTab, token);
     setEntities(data);
   } catch (error) {
     console.error(`Error fetching ${activeTab}:`, error);
   }
 };
 
-export const fetchUiElements = async (activeTab, setUiElements, setSearchTerm) => {
+export const fetchUiElementsData = async (activeTab, setUiElements, token) => {
   try {
-    const data = await fetchData('ui-elements');
+    const data = await fetchData('ui-elements', token);
     setUiElements(data);
   } catch (error) {
     console.error(`Error fetching UI elements:`, error);
   }
 };
 
-
 export const handleInputChange = (value, key, entityData, setEntityData) => {
-  console.log("functions.handleInputChange: value= " + value + ", key= " + key);
   setEntityData({ ...entityData, [key]: value });
 };
 
-export const handleSubmit = async (e, isNewEntity, activeTab, entityData, entities, setEntities, selectedEntityIndex, setSelectedEntityIndex, uiElements, setEntityData, postData, updateData, setSearchTerm) => {
+export const handleSubmit = async (e, isNewEntity, activeTab, entityData, entities, setEntities, selectedEntityIndex, setSelectedEntityIndex, uiElements, setEntityData, token) => {
   e.preventDefault();
 
   const endpoint = isNewEntity ? activeTab : `${activeTab}/${entityData.id}`;
   const apiFunction = isNewEntity ? postData : updateData;
 
   try {
-    const data = await apiFunction(endpoint, entityData);
+    const data = await apiFunction(endpoint, entityData, token);
     if (isNewEntity) {
       setEntities([...entities, data]);
     } else {
@@ -62,7 +60,7 @@ export const handleEdit = async (index, entity, entities, setEntityData, setSele
   }
 };
 
-export const handleNewEntity = async (activeTab, uiElements, postData) => {
+export const handleNewEntity = async (activeTab, uiElements) => {
   try {
     // Create an empty entity object with id set to null
     const emptyEntity = { id: null };
@@ -75,21 +73,12 @@ export const handleNewEntity = async (activeTab, uiElements, postData) => {
       emptyEntity[element.entityid] = '';
     });
 
-    // Submit postData with the empty entity
-    // const newEntity = await postData(activeTab, emptyEntity);
-
-    const newEntity = emptyEntity;
-    
-    return newEntity;
+    return emptyEntity;
   } catch (error) {
     console.error('Error creating new entity:', error);
     throw error;
   }
 };
-
-
-
-
 
 export const handleClear = (activeTab, uiElements, setEntityData) => {
   const filteredElements = uiElements.filter(element => element.entity === activeTab);

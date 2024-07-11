@@ -1,11 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Grid, Button, Typography } from '@mui/material';
 import DynamicComponent from './DynamicComponent';
-import { fetchAttributesByEntity, fetchData } from './api';
 
-const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, name, collections }) => {
-  const [attributes, setAttributes] = useState({});
-  const [datasets, setDatasets] = useState({});
+const EntityForm = ({
+  id,
+  components,
+  onInputChange,
+  onSubmit,
+  onClear,
+  data,
+  name,
+  collections,
+  attributes,
+  datasets,
+  setAttributes,
+  setDatasets,
+  fetchAttributesByEntity,
+  fetchData,
+  token
+}) => {
 
   useEffect(() => {
     components.forEach(component => {
@@ -17,10 +30,10 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
     });
   }, [components, data]);
 
-
   const handleEntityRefChange = async (entityName, entityid) => {
     try {
-      const fetchedAttributes = await fetchAttributesByEntity(entityName);
+      console.log('0) EntityForm.fetchAttributesByEntity: token=', token);
+      const fetchedAttributes = await fetchAttributesByEntity(entityName, token);
       const formattedAttributes = fetchedAttributes.map(attr => ({
         label: attr.name,
         value: attr.name
@@ -35,14 +48,12 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
   };
 
   const handleRefChanges = async (entityid) => {
-    console.log("handleRefChanges: entityid= " + entityid);
     try {
-      const fetchedData = await fetchData(entityid);
+      const fetchedData = await fetchData(entityid, token);
       const formattedData = fetchedData.map(item => ({
-        label: item.name,  // Assuming 'name' is the field to display
-        value: item._id  // Assuming '_id' is the unique identifier
+        label: item.name,
+        value: item._id
       }));
-      console.log("handleRefChanges: formattedData= ", formattedData);
       setDatasets(prev => ({ ...prev, [entityid]: formattedData }));
     } catch (error) {
       console.error(`Error fetching data for ${entityid}:`, error);
@@ -75,7 +86,7 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
     { label: 'String', value: 'String' },
     { label: 'Number', value: 'Number' },
     { label: 'Date', value: 'Date' },
-    { label: 'Ref', value: 'Ref' },
+    { label: 'Ref', value: 'Ref' }
   ];
 
   const uiTypeOptions = [
@@ -105,7 +116,7 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
       );
       expectedOrder++;
     }
-    
+
     filledComponents.push(
       <Grid key={component.entityid} item xs={12 / maxCols}>
         <DynamicComponent
@@ -121,7 +132,8 @@ const EntityForm = ({ id, components, onInputChange, onSubmit, onClear, data, na
             component.type === 'typeSelect' ? typeOptions :
             component.type === 'ref' ? datasets[component.entityid] || [] :
             component.type === 'entityRef' ? collections :
-            component.type === 'entityIdRef' ? attributes['entity'] || [] : []}
+            component.type === 'entityIdRef' ? attributes['entity'] || [] : []
+          }
         />
       </Grid>
     );

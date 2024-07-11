@@ -3,9 +3,9 @@ import Sidebar from './Sidebar';
 import queryString from 'query-string'; // Import queryString library
 import * as functions from './functions'; // Import functions
 import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation hook
-import { reinitializeSchemas } from './api'; // Make sure listCollections is correctly imported
+import { reinitializeSchemas } from './api'; // Ensure listCollections is correctly imported
 
-const SidebarWrapper = ({sections }) => {
+const SidebarWrapper = ({ sections, token }) => {
   const navigate = useNavigate();
   const location = useLocation(); // Get location object
   const queryParams = queryString.parse(location.search); // Parse query parameters
@@ -15,41 +15,39 @@ const SidebarWrapper = ({sections }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true); // State to track sidebar visibility
 
   useEffect(() => {
-    functions.fetchUiElements(activeTab, setUiElements, setSearchTerm);
+    functions.fetchUiElementsData(activeTab, setUiElements, setSearchTerm, token);
     setSearchTerm('');
-  }, [activeTab]);
+  }, [activeTab, token]);
 
-    const handleReinitializeClick = () => {
-        reinitializeSchemas().then(() => {
-          alert('Schemas reinitialized successfully');
-        }).catch((error) => {
-          console.error("Failed to reinitialize schemas:", error);
-          alert('Failed to reinitialize schemas');
-        });
-      };
+  const handleReinitializeClick = () => {
+    reinitializeSchemas(token)
+      .then(() => {
+        alert('Schemas reinitialized successfully');
+      })
+      .catch((error) => {
+        console.error("Failed to reinitialize schemas:", error);
+        alert('Failed to reinitialize schemas');
+      });
+  };
 
-      const handleTabChange = (tab) => {
+  const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
 
-
-
-
-
-    return (
-        <div style={{ width: 300 }}>  {/* Adjust width as necessary */}
-            <Sidebar
-                navigateToCreateCollection={() => navigate("/create-collection-form")}
-                handleReinitializeClick={handleReinitializeClick}
-                handleTabChange={handleTabChange}
-                uiElements={uiElements}
-                activeTab={activeTab}
-                sidebarOpen={sidebarOpen}
-                sections={sections}
-            />
-            <button onClick={() => setSidebarOpen(!sidebarOpen)}>Toggle Sidebar</button>
-        </div>
-    );
+  return (
+    <div style={{ width: 300 }}> {/* Adjust width as necessary */}
+      <Sidebar
+        navigateToCreateCollection={() => navigate("/create-collection-form")}
+        handleReinitializeClick={handleReinitializeClick}
+        handleTabChange={handleTabChange}
+        uiElements={uiElements}
+        activeTab={activeTab}
+        sidebarOpen={sidebarOpen}
+        sections={sections}
+      />
+      <button onClick={() => setSidebarOpen(!sidebarOpen)}>Toggle Sidebar</button>
+    </div>
+  );
 };
 
 export default SidebarWrapper;

@@ -2,42 +2,75 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Box, Button } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import EntityForm from './EntityForm';
-import { postData, updateData, fetchEntityById, listCollections } from './api'; // Ensure listCollections is imported
-import * as functions from './functions'; // Import functions
+import { postData, updateData, fetchEntityById, listCollections, fetchAttributesByEntity, fetchData } from './api';
+import * as functions from './functions';
 
-const EntityFormWrapper = () => {
+const EntityFormWrapper = ({ token }) => {
   const { entity, entityId } = useParams();
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const selectedEntityParam = urlParams.get('selectedEntity');
-  const [selectedEntity, setSelectedEntity] = useState(selectedEntityParam);
   const [uiElements, setUiElements] = useState([]);
   const [entityData, setEntityData] = useState({});
   const [collections, setCollections] = useState([]);
+  const [attributes, setAttributes] = useState({});
+  const [datasets, setDatasets] = useState({});
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      functions.fetchUiElements(entity, setUiElements, data => {
-        return data.filter(element => element.entity === entity);
-      });
+      try {
+        console.log('1) EntityFormWrapper.fetchInitialData: token= ', token);
+        await functions.fetchUiElementsData(entity, setUiElements, token);  // Correctly pass token here
 
-      // Only fetch entity data if an entityId exists
-      if (entityId !== undefined && entityId !== null) {
-        fetchEntityData(entity, entityId);
+        if (entityId !== undefined && entityId !== null) {
+          await fetchEntityData(entity, entityId);
+        }
+
+        const fetchedCollections = await listCollections(token);
+        setCollections(fetchedCollections.map(name => ({ label: name, value: name })));
+
+        await fetchAttributesAndReferences();
+      } catch (error) {
+        console.error('Error fetching initial data:', error);
       }
-
-      const fetchedCollections = await listCollections();
-      setCollections(fetchedCollections.map(name => ({ label: name, value: name })));
     };
     fetchInitialData();
-  }, [entity, entityId]);
+  }, [entity, entityId, token]);
 
   const fetchEntityData = async (entity, entityId) => {
     try {
-      const data = await fetchEntityById(entity, entityId);
+      const data = await fetchEntityById(entity, entityId, token);
       setEntityData(data);
     } catch (error) {
       console.error(`Error fetching ${entity} by ID ${entityId}:`, error);
+    }
+  };
+
+  const fetchAttributesAndReferences = async () => {
+    try {
+      const attributePromises = uiElements.map(async (component) => {
+        if (component.type === 'entityRef') {
+          const fetchedAttributes = await fetchAttributesByEntity(component.entityid, token);
+          return { [component.entityid]: fetchedAttributes.map(attr => ({ label: attr.name, value: attr.name })) };
+        }
+        return {};
+      });
+
+      const referencePromises = uiElements.map(async (component) => {
+        if (component.type === 'ref') {
+          const fetchedData = await fetchData(component.entityid, token);
+          return { [component.entityid]: fetchedData.map(item => ({ label: item.name, value: item._id })) };
+        }
+        return {};
+      });
+
+      const resolvedAttributes = await Promise.all(attributePromises);
+      const resolvedReferences = await Promise.all(referencePromises);
+
+      setAttributes(Object.assign({}, ...resolvedAttributes));
+      setDatasets(Object.assign({}, ...resolvedReferences));
+    } catch (error) {
+      console.error('Error fetching attributes and references:', error);
     }
   };
 
@@ -49,31 +82,29 @@ const EntityFormWrapper = () => {
     e.preventDefault();
     const isCreation = entityId === null || entityId === undefined;
     const endpoint = isCreation ? entity : `${entity}/${entityId}`;
-  
+
     try {
       let updatedData;
       if (isCreation) {
-        updatedData = await postData(endpoint, entityData);
+        updatedData = await postData(endpoint, entityData, token);
         navigate(`/${entity}/${updatedData._id}`);
       } else {
-        console.log('handleSubmit: entityData', entityData);
-        updatedData = await updateData(endpoint, entityData);
+        updatedData = await updateData(endpoint, entityData, token);
       }
       setEntityData(updatedData);
     } catch (error) {
       console.error(`Error ${isCreation ? "creating" : "updating"} ${entity} data:`, error);
     }
   };
-  
+
   const handleClear = () => {
     functions.handleClear(entity, uiElements, setEntityData);
   };
 
   const handleBack = () => {
-    const navigationString = `/?activeTab=${entity}&selectedEntity=${selectedEntity}`;
+    const navigationString = `/?activeTab=${entity}&selectedEntity=${selectedEntityParam}`;
     navigate(navigationString);
   };
-  
 
   return (
     <Grid container spacing={2}>
@@ -92,7 +123,13 @@ const EntityFormWrapper = () => {
             data={entityData}
             name={entity}
             collections={collections}
-            selectedEntity={selectedEntity}
+            attributes={attributes}
+            datasets={datasets}
+            setAttributes={setAttributes}
+            setDatasets={setDatasets}
+            fetchAttributesByEntity={fetchAttributesByEntity}
+            fetchData={fetchData}
+            token={token}
           />
         </Box>
       </Grid>
